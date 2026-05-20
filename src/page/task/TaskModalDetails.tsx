@@ -10,7 +10,7 @@ import { getTaskById, updateStatusTask } from "../../api/task.api";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 import { formatDate } from "../../util/format-date";
-import { statusTranslation, priorityTranslation } from "../../traductor/es";
+import { statusTranslation} from "../../traductor/es";
 import { TaskStatus } from "../../types";
 import PriorityBadge from "../../components/PriorityBadge";
 import NotesPanel from "../../components/notes/NotesPanel";

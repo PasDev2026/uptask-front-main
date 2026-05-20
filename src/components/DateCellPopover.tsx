@@ -94,7 +94,7 @@ export default function DateCellPopover({ projectId, startDate, dueDate, isOverd
 
     return (
         <Popover>
-            {({ open }) => (
+            {({ }) => (
                 <>
                     <PopoverButton
                         className={`text-left text-sm transition-colors rounded px-1 py-0.5 -ml-1

@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import api from "../lib/axios";
-import { dashboardProjectsSchema, editProjectSchema, fullProjectDetailsSchema, Project, ProjectFormData, projectSchema, taskPreviewResponseSchema, ProjectsResponse } from "../types";
+import { dashboardProjectsSchema, editProjectSchema, fullProjectDetailsSchema, Project, ProjectFormData, taskPreviewResponseSchema, ProjectsResponse } from "../types";
 //dato este archivo trabaja con el archivo de los types index.js
 export async function createProject(formData:ProjectFormData) {
     const token = localStorage.getItem('AUTH_TOKEN') //obtenemos el token
