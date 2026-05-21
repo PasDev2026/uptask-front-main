@@ -10,7 +10,7 @@ export async function createProject(formData:ProjectFormData) {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error('desde onError');
+            throw new Error(error.response.data.message ?? 'Error al crear proyecto');
           }
     }
 }

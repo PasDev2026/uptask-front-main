@@ -129,179 +129,187 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-lg transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
                 <Dialog.Title as="h3" className="text-2xl font-black mb-6">
                   Crear usuario
                 </Dialog.Title>
 
-                <form onSubmit={handleSubmit(handleCreate)} className="space-y-4" noValidate>
-                  {/* Nombre */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-name" className="font-medium text-gray-700">
-                      Nombre
-                    </label>
-                    <input
-                      id="create-name"
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      {...register("name")}
-                    />
-                    {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
-                  </div>
+                <form onSubmit={handleSubmit(handleCreate)} noValidate>
+                  <div className="max-h-[65vh] overflow-y-auto -mr-2 pr-2">
+                    <div className="grid grid-cols-2 gap-x-6">
+                      <div className="space-y-4">
+                        {/* Nombre */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-name" className="font-medium text-gray-700">
+                            Nombre
+                          </label>
+                          <input
+                            id="create-name"
+                            type="text"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            {...register("name")}
+                          />
+                          {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+                        </div>
 
-                  {/* Apellido Paterno */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-apellido_paterno" className="font-medium text-gray-700">
-                      Apellido paterno
-                    </label>
-                    <input
-                      id="create-apellido_paterno"
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      {...register("apellido_paterno")}
-                    />
-                    {errors.apellido_paterno && <p className="text-sm text-red-600">{errors.apellido_paterno.message}</p>}
-                  </div>
+                        {/* Apellido Paterno */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-apellido_paterno" className="font-medium text-gray-700">
+                            Apellido paterno
+                          </label>
+                          <input
+                            id="create-apellido_paterno"
+                            type="text"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            {...register("apellido_paterno")}
+                          />
+                          {errors.apellido_paterno && <p className="text-sm text-red-600">{errors.apellido_paterno.message}</p>}
+                        </div>
 
-                  {/* Apellido Materno */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-apellido_materno" className="font-medium text-gray-700">
-                      Apellido materno
-                    </label>
-                    <input
-                      id="create-apellido_materno"
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      {...register("apellido_materno")}
-                    />
-                    {errors.apellido_materno && <p className="text-sm text-red-600">{errors.apellido_materno.message}</p>}
-                  </div>
+                        {/* Apellido Materno */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-apellido_materno" className="font-medium text-gray-700">
+                            Apellido materno
+                          </label>
+                          <input
+                            id="create-apellido_materno"
+                            type="text"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            {...register("apellido_materno")}
+                          />
+                          {errors.apellido_materno && <p className="text-sm text-red-600">{errors.apellido_materno.message}</p>}
+                        </div>
 
-                  {/* Teléfono */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-telefono" className="font-medium text-gray-700">
-                      Teléfono
-                    </label>
-                    <input
-                      id="create-telefono"
-                      type="tel"
-                      placeholder="Máximo 9 dígitos"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      value={watch("telefono") || ""}
-                      onChange={handlePhoneInput}
-                    />
-                    {errors.telefono && <p className="text-sm text-red-600">{errors.telefono.message}</p>}
-                  </div>
+                        {/* DNI */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-dni" className="font-medium text-gray-700">
+                            DNI
+                          </label>
+                          <input
+                            id="create-dni"
+                            type="text"
+                            placeholder="Documento Nacional de Identidad"
+                            className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none ${
+                              dniError ? "border-red-500" : "border-gray-300"
+                            }`}
+                            value={watch("dni") || ""}
+                            onChange={handleDniInput}
+                          />
+                          {errors.dni && <p className="text-sm text-red-600">{errors.dni.message}</p>}
+                          {dniError && <p className="text-sm text-red-600">{dniError}</p>}
+                        </div>
 
-                  {/* DNI */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-dni" className="font-medium text-gray-700">
-                      DNI
-                    </label>
-                    <input
-                      id="create-dni"
-                      type="text"
-                      placeholder="Documento Nacional de Identidad"
-                      className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none ${
-                        dniError ? "border-red-500" : "border-gray-300"
-                      }`}
-                      value={watch("dni") || ""}
-                      onChange={handleDniInput}
-                    />
-                    {errors.dni && <p className="text-sm text-red-600">{errors.dni.message}</p>}
-                    {dniError && <p className="text-sm text-red-600">{dniError}</p>}
-                  </div>
+                        {/* Teléfono */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-telefono" className="font-medium text-gray-700">
+                            Teléfono
+                          </label>
+                          <input
+                            id="create-telefono"
+                            type="tel"
+                            placeholder="Máximo 9 dígitos"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            value={watch("telefono") || ""}
+                            onChange={handlePhoneInput}
+                          />
+                          {errors.telefono && <p className="text-sm text-red-600">{errors.telefono.message}</p>}
+                        </div>
+                      </div>
 
-                  {/* Username */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-username" className="font-medium text-gray-700">
-                      Username
-                    </label>
-                    <input
-                      id="create-username"
-                      type="text"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      {...register("username")}
-                    />
-                    {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
-                  </div>
+                      <div className="space-y-4">
+                        {/* Username */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-username" className="font-medium text-gray-700">
+                            Username
+                          </label>
+                          <input
+                            id="create-username"
+                            type="text"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            {...register("username")}
+                          />
+                          {errors.username && <p className="text-sm text-red-600">{errors.username.message}</p>}
+                        </div>
 
-                  {/* Email */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-email" className="font-medium text-gray-700">
-                      Email
-                    </label>
-                    <input
-                      id="create-email"
-                      type="email"
-                      className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                      {...register("email")}
-                    />
-                    {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
-                  </div>
+                        {/* Email */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-email" className="font-medium text-gray-700">
+                            Email
+                          </label>
+                          <input
+                            id="create-email"
+                            type="email"
+                            className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                            {...register("email")}
+                          />
+                          {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+                        </div>
 
-                  {/* Contraseña */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-password" className="font-medium text-gray-700">
-                      Contraseña
-                    </label>
-                    <div className="relative">
-                      <input
-                        id="create-password"
-                        type={showPassword ? "text" : "password"}
-                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none pr-10"
-                        {...register("password")}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setShowPassword(!showPassword)}
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-600 hover:text-gray-800"
-                      >
-                        {showPassword ? "Ocultar" : "Mostrar"}
-                      </button>
+                        {/* Contraseña */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-password" className="font-medium text-gray-700">
+                            Contraseña
+                          </label>
+                          <div className="relative">
+                            <input
+                              id="create-password"
+                              type={showPassword ? "text" : "password"}
+                              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none pr-10"
+                              {...register("password")}
+                            />
+                            <button
+                              type="button"
+                              onClick={() => setShowPassword(!showPassword)}
+                              className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm text-gray-600 hover:text-gray-800"
+                            >
+                              {showPassword ? "Ocultar" : "Mostrar"}
+                            </button>
+                          </div>
+                          {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
+                        </div>
+
+                        {/* Sede */}
+                        <div className="flex flex-col gap-1">
+                          <label className="font-medium text-gray-700">
+                            Empresa
+                          </label>
+                          <SedeSelector
+                            value={watch("empresa") || ""}
+                            onChange={handleSedeChange}
+                          />
+                          {errors.empresa && <p className="text-sm text-red-600">{errors.empresa.message}</p>}
+                        </div>
+
+                        {/* Rol */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-role" className="font-medium text-gray-700">
+                            Rol (opcional)
+                          </label>
+                          {rolesLoading ? (
+                            <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                              Cargando roles...
+                            </div>
+                          ) : rolesError ? (
+                            <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 text-red-600 text-sm">
+                              Error al cargar los roles
+                            </div>
+                          ) : (
+                            <select
+                              id="create-role"
+                              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                              {...register("role")}
+                            >
+                              <option value="">-- Seleccione una opcion --</option>
+                              {roles?.map((role: Role) => (
+                                <option key={role._id} value={role._id}>
+                                  {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
-                  </div>
-
-                  {/* Sede */}
-                  <div className="flex flex-col gap-1">
-                    <label className="font-medium text-gray-700">
-                      Empresa
-                    </label>
-                    <SedeSelector
-                      value={watch("empresa") || ""}
-                      onChange={handleSedeChange}
-                    />
-                    {errors.empresa && <p className="text-sm text-red-600">{errors.empresa.message}</p>}
-                  </div>
-
-                  {/* Rol */}
-                  <div className="flex flex-col gap-1">
-                    <label htmlFor="create-role" className="font-medium text-gray-700">
-                      Rol (opcional)
-                    </label>
-                    {rolesLoading ? (
-                      <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
-                        Cargando roles...
-                      </div>
-                    ) : rolesError ? (
-                      <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 text-red-600 text-sm">
-                        Error al cargar los roles
-                      </div>
-                    ) : (
-                      <select
-                        id="create-role"
-                        className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-fuchsia-500 focus:outline-none"
-                        {...register("role")}
-                      >
-                        <option value="">-- Seleccione una opcion --</option>
-                        {roles?.map((role: Role) => (
-                          <option key={role._id} value={role._id}>
-                            {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
-                          </option>
-                        ))}
-                      </select>
-                    )}
                   </div>
 
                   {/* Botones */}
@@ -317,7 +325,7 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
                     <button
                       type="submit"
                       disabled={isSubmitting}
-                      className="flex-1 px-4 py-3 bg-fuchsia-600 hover:bg-fuchsia-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-dark text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       {isSubmitting ? "Creando..." : "Crear usuario"}
                     </button>

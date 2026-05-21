@@ -25,6 +25,7 @@ export default function SubtaskChecklist({ projectId, taskId }: SubtaskChecklist
       queryClient.invalidateQueries({ queryKey: ["subtasks", projectId, taskId] });
       queryClient.invalidateQueries({ queryKey: ["editProject", projectId] });
       queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 
@@ -34,6 +35,7 @@ export default function SubtaskChecklist({ projectId, taskId }: SubtaskChecklist
       queryClient.invalidateQueries({ queryKey: ["subtasks", projectId, taskId] });
       queryClient.invalidateQueries({ queryKey: ["editProject", projectId] });
       queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
     },
   });
 

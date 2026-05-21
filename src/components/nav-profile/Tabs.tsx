@@ -24,7 +24,7 @@ export default function Tabs() {
                 <select
                     id="tabs"
                     name="tabs"
-                    className="block w-full rounded-md border-gray-300 focus:border-purple-800 focus:ring-purple-800"
+                    className="block w-full rounded-md border-gray-300 focus:border-brand-primary focus:ring-brand-primary"
                     onChange={ (e: React.ChangeEvent<HTMLSelectElement>) => navigate(e.target.value) }
                     value={currentTab}
                 >
@@ -47,14 +47,14 @@ export default function Tabs() {
                                 to={tab.href}
                                 className={classNames(
                                     location.pathname === tab.href
-                                        ? 'border-purple-800 text-purple-800'
+                                        ? 'border-brand-primary text-brand-primary'
                                         : 'border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700',
                                     'group inline-flex items-center border-b-2 py-4 px-1 text-sm font-medium'
                                 )}
                             >
                                 <tab.icon
                                     className={classNames(
-                                        location.pathname === tab.href ? 'text-purple-800' : 'text-gray-400 group-hover:text-gray-500',
+                                        location.pathname === tab.href ? 'text-brand-primary' : 'text-gray-400 group-hover:text-gray-500',
                                         '-ml-0.5 mr-2 h-5 w-5'
                                     )}
                                     aria-hidden="true"

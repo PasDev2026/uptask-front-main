@@ -11,6 +11,7 @@ export async function createAccount(formData:UserRegistrationForm) {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -23,6 +24,7 @@ export async function confirmAccount(formData:ConfirmToken) {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -35,6 +37,7 @@ export async function requestConfirmationCodeForm(formData:RequestConfirmationCo
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -49,6 +52,7 @@ export async function authenticate(formData:UserLoginForm) {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -61,6 +65,7 @@ export async function changePassword(formData:ForgotPasswordForm) {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -73,6 +78,7 @@ export async function validateToken(formData:ConfirmToken) {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -87,6 +93,7 @@ export async function updatePasswordWithToken({formData, token}:{formData: NewPa
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -99,6 +106,7 @@ export async function getUserApi() {
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }
 
@@ -114,5 +122,6 @@ export async function checkPasswordApi(formData:CheckPasswordForm) { //revia si 
         if(isAxiosError(error) && error.response){
             throw new Error(error.response.data.message);
         }
+        throw new Error('Error de conexión con el servidor');
     }
 }

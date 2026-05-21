@@ -22,9 +22,7 @@ export default function Login() {
         text: "Hubo un error, verifique los datos! O la cuenta no ha sido confirmada",
       });
     },
-    onSuccess: (data) => {
-      console.log(data);
-      //Swal.fire(data, "Bienvenido", "success");
+    onSuccess: () => {
       navigate('/dashboard')
     },
   })

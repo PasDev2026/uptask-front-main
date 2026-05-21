@@ -46,6 +46,7 @@ export const useUpdateTaskStatus = () => {
 
             queryClient.invalidateQueries({ queryKey: ["editProject", variables.projectId] })
             queryClient.invalidateQueries({ queryKey: ["subtasks"] })
+            queryClient.invalidateQueries({ queryKey: ["projects"] })
         },
     })
 }

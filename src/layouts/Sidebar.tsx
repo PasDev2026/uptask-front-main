@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { User } from "../auth/validation";
 import { useQueryClient } from "@tanstack/react-query";
 import { UserCircleIcon, FolderIcon, UsersIcon, ArrowRightOnRectangleIcon } from "@heroicons/react/20/solid";
@@ -11,9 +11,11 @@ type SidebarProps = {
 export default function Sidebar({ name, role }: SidebarProps) {
 
   const queryClient = useQueryClient()
+  const navigate = useNavigate()
   const logout = () => {
     localStorage.removeItem('AUTH_TOKEN')
-    queryClient.invalidateQueries({ queryKey: ['user'] })
+    queryClient.removeQueries({ queryKey: ['user'] })
+    navigate('/auth/login')
   }
 
   return (

@@ -50,6 +50,7 @@ export default function TaskModalDetails() {
       queryCliente.invalidateQueries({ queryKey: ["editProject", projectId] });
       queryCliente.invalidateQueries({ queryKey: ["task", taskId] });
       queryCliente.invalidateQueries({ queryKey: ["projectTasks", projectId] });
+      queryCliente.invalidateQueries({ queryKey: ["projects"] });
       Swal.fire({
         icon: "success",
         title: data,

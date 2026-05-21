@@ -4,12 +4,12 @@ import { getUserApi } from "../api/auth.api";
 
 export const useAuth = () => {
     
-    const {data, isError, isLoading} = useQuery({
+    const {data, isError, isLoading, isFetching} = useQuery({
             queryKey: ['user'], 
             queryFn: getUserApi,
             retry: 1,
             refetchOnWindowFocus: false
         })
 
-    return {data, isError, isLoading}
+    return {data, isError, isLoading, isFetching}
 }

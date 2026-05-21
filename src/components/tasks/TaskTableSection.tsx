@@ -1,7 +1,8 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getProjectTasksPreview } from "../../api/project.api"
+import { createTask } from "../../api/task.api"
 import { TaskPreviewResponse } from "../../types"
 import TaskTableSubtasks from "./TaskTableSubtasks"
 import TaskStatusPopover from "../TaskStatusPopover"
@@ -13,7 +14,7 @@ import { useUpdateTaskAssignee } from "../../hooks/useUpdateTaskAssignee"
 import { useDeleteTask } from "../../hooks/useDeleteTask"
 import TaskDateCellPopover from "../TaskDateCellPopover"
 import { TABLE_GRID } from "../../constants/tableColumns"
-import { ChevronDownIcon, ChevronRightIcon, TrashIcon } from "@heroicons/react/20/solid"
+import { ChevronDownIcon, ChevronRightIcon, PlusIcon, CheckIcon, XMarkIcon, TrashIcon } from "@heroicons/react/20/solid"
 import Swal from "sweetalert2"
 
 type TaskTableSectionProps = {
@@ -24,8 +25,11 @@ type TaskTableSectionProps = {
   projectDueDate?: string | null
 }
 
-export default function TaskTableSection({ projectId, canEdit, depth = 0, projectStartDate, projectDueDate }: TaskTableSectionProps) {
+export default function TaskTableSection({ projectId, canEdit, depth = 1, projectStartDate, projectDueDate }: TaskTableSectionProps) {
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
+  const [showForm, setShowForm] = useState(false)
+  const [newTaskName, setNewTaskName] = useState("")
+  const queryClient = useQueryClient()
 
   const { data, isLoading, isError } = useQuery<TaskPreviewResponse>({
     queryKey: ["projectTasks", projectId],
@@ -33,6 +37,21 @@ export default function TaskTableSection({ projectId, canEdit, depth = 0, projec
       const result = await getProjectTasksPreview(projectId)
       if (!result) throw new Error("No data")
       return result
+    },
+  })
+
+  const createRootTask = useMutation({
+    mutationFn: async (name: string) => {
+      return createTask({
+        formData: { name },
+        projectId,
+      })
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] })
+      queryClient.invalidateQueries({ queryKey: ["projects"] })
+      setNewTaskName("")
+      setShowForm(false)
     },
   })
 
@@ -89,8 +108,58 @@ export default function TaskTableSection({ projectId, canEdit, depth = 0, projec
 
   if (rootTasks.length === 0) {
     return (
-      <div className="px-4 py-3">
-        <p className="text-xs text-gray-400">No hay tareas en este proyecto</p>
+      <div className="border-t border-slate-100">
+        <div className="px-4 py-3">
+          <p className="text-xs text-gray-400 mb-2">No hay tareas en este proyecto</p>
+          {canEdit && (
+            <button
+              onClick={() => setShowForm(true)}
+              className="flex items-center gap-1 text-xs text-brand-primary hover:text-brand-dark transition-colors"
+            >
+              <PlusIcon className="h-3.5 w-3.5" />
+              Añadir tarea
+            </button>
+          )}
+        </div>
+        {canEdit && showForm && (
+          <div className="flex items-center gap-2 px-4 py-2 border-t border-slate-100">
+            <input
+              type="text"
+              value={newTaskName}
+              onChange={(e) => setNewTaskName(e.target.value)}
+              placeholder="Nombre de la tarea"
+              className="flex-1 text-xs border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-brand-primary"
+              autoFocus
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && newTaskName.trim()) {
+                  createRootTask.mutate(newTaskName.trim())
+                }
+                if (e.key === "Escape") {
+                  setShowForm(false)
+                  setNewTaskName("")
+                }
+              }}
+            />
+            <button
+              onClick={() => {
+                if (newTaskName.trim()) createRootTask.mutate(newTaskName.trim())
+              }}
+              disabled={!newTaskName.trim() || createRootTask.isPending}
+              className="p-1 text-brand-primary hover:text-brand-dark disabled:text-gray-300"
+            >
+              <CheckIcon className="h-3.5 w-3.5" />
+            </button>
+            <button
+              onClick={() => {
+                setShowForm(false)
+                setNewTaskName("")
+              }}
+              className="p-1 text-gray-400 hover:text-gray-600"
+            >
+              <XMarkIcon className="h-3.5 w-3.5" />
+            </button>
+          </div>
+        )}
       </div>
     )
   }
@@ -202,6 +271,58 @@ export default function TaskTableSection({ projectId, canEdit, depth = 0, projec
           >
             Mostrando {visibleTasks.length} de {rootTasks.length} tareas. Ver todas &rarr;
           </Link>
+        </div>
+      )}
+
+      {canEdit && !showForm && (
+        <div className="border-t border-slate-100">
+          <button
+            onClick={() => setShowForm(true)}
+            className="flex items-center gap-1 px-4 py-2 text-xs text-brand-primary hover:text-brand-dark transition-colors"
+          >
+            <PlusIcon className="h-3.5 w-3.5" />
+            Añadir tarea
+          </button>
+        </div>
+      )}
+
+      {canEdit && showForm && (
+        <div className="flex items-center gap-2 px-4 py-2 border-t border-slate-100">
+          <input
+            type="text"
+            value={newTaskName}
+            onChange={(e) => setNewTaskName(e.target.value)}
+            placeholder="Nombre de la tarea"
+            className="flex-1 text-xs border border-slate-300 rounded px-2 py-1.5 focus:outline-none focus:border-brand-primary"
+            autoFocus
+            onKeyDown={(e) => {
+              if (e.key === "Enter" && newTaskName.trim()) {
+                createRootTask.mutate(newTaskName.trim())
+              }
+              if (e.key === "Escape") {
+                setShowForm(false)
+                setNewTaskName("")
+              }
+            }}
+          />
+          <button
+            onClick={() => {
+              if (newTaskName.trim()) createRootTask.mutate(newTaskName.trim())
+            }}
+            disabled={!newTaskName.trim() || createRootTask.isPending}
+            className="p-1 text-brand-primary hover:text-brand-dark disabled:text-gray-300"
+          >
+            <CheckIcon className="h-3.5 w-3.5" />
+          </button>
+          <button
+            onClick={() => {
+              setShowForm(false)
+              setNewTaskName("")
+            }}
+            className="p-1 text-gray-400 hover:text-gray-600"
+          >
+            <XMarkIcon className="h-3.5 w-3.5" />
+          </button>
         </div>
       )}
     </div>

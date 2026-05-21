@@ -171,7 +171,7 @@ export default function ProjectTableRow({ project, user }: ProjectTableRowProps)
                         <Disclosure.Panel static>
                             <TaskTableSection
                                 projectId={project._id}
-                                canEdit={isManager(project.manager, user._id)}
+                                canEdit={true}
                                 projectStartDate={project.startDate}
                                 projectDueDate={project.dueDate}
                             />

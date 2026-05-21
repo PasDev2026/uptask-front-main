@@ -37,6 +37,7 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
     onSuccess: (data) => {
       Swal.fire(data?._id, "Tarea eliminada correctamente", "success");
       queryClient.invalidateQueries({ queryKey: ["editProject", projectId] });
+      queryClient.invalidateQueries({ queryKey: ["projects"] });
       navigate(location.pathname, { replace: true });
     },
   })

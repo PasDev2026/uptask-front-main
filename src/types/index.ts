@@ -35,7 +35,7 @@ export type ProjectStatus = z.infer<typeof projectStatusSchema>
 export const taskSchema = z.object({
     _id: z.string(),
     name: z.string(),
-    description: z.string(),
+    description: z.string().default(''),
     project: z.string(),
     status: taskStatusSchema,
     priority: taskPrioritySchema.default("medium"),
@@ -82,7 +82,7 @@ export const taskPreviewResponseSchema = z.object({
 export type TaskPreviewResponse = z.infer<typeof taskPreviewResponseSchema>
 
 export type Task = z.infer<typeof taskSchema>
-export type TaskFormData = Pick<Task, 'name' | 'description'> & Partial<Pick<Task, 'priority' | 'startDate' | 'dueDate'>>
+export type TaskFormData = Pick<Task, 'name'> & Partial<Pick<Task, 'description' | 'priority' | 'startDate' | 'dueDate'>>
 export type TaskProject = z.infer<typeof taskProjectSchema>
 
 
@@ -91,7 +91,7 @@ export const projectSchema = z.object({
     _id: z.string(),
     projectName: z.string(),
     clientName: z.string(),
-    description: z.string(),
+    description: z.string().default(''),
     manager: z.string(),
     status: projectStatusSchema.default("planning"),
     priority: taskPrioritySchema.default("medium"),
@@ -107,7 +107,7 @@ export const dashboardProjectsSchema = z.object({
             _id: z.string(),
             clientName: z.string(),
             projectName: z.string(),
-            description: z.string(),
+            description: z.string().default(''),
             manager: z.string(),
             status: projectStatusSchema.default("planning"),
             priority: taskPrioritySchema.default("medium"),

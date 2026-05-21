@@ -17,6 +17,7 @@ export const useDeleteTask = () => {
         onSuccess: (_data, variables) => {
             Swal.fire("Eliminado", "Tarea eliminada correctamente", "success")
             queryClient.invalidateQueries({ queryKey: ["projectTasks", variables.projectId] })
+            queryClient.invalidateQueries({ queryKey: ["projects"] })
             if (variables.parentTaskId) {
                 queryClient.invalidateQueries({ queryKey: ["subtasks", variables.parentTaskId] })
             }

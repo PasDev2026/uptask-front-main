@@ -7,11 +7,11 @@ import Spineer from "../components/Spineer";
 
 export default function AppLayout() {
   
-  const {data, isError, isLoading} = useAuth()
+  const {data, isError, isLoading, isFetching} = useAuth()
 
-  if(isLoading) return  <Spineer />
+  if(isLoading) return <Spineer />
   
-  if(isError) return <Navigate to='/auth/login'/>
+  if(isError && !isFetching) return <Navigate to='/auth/login'/>
   
   if(data) return (
     <div>

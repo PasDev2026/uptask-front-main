@@ -68,6 +68,7 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["subtasks", subtask._id] })
       queryClient.invalidateQueries({ queryKey: ["projectTasks", projectId] })
+      queryClient.invalidateQueries({ queryKey: ["projects"] })
       setNewTaskName("")
       setShowForm(false)
     },
