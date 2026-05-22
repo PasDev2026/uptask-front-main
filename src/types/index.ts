@@ -93,6 +93,7 @@ export const projectSchema = z.object({
     clientName: z.string(),
     description: z.string().default(''),
     manager: z.string(),
+    empresa: z.string(),
     status: projectStatusSchema.default("planning"),
     priority: taskPrioritySchema.default("medium"),
     tasks: z.array(taskProjectSchema),
@@ -109,6 +110,7 @@ export const dashboardProjectsSchema = z.object({
             projectName: z.string(),
             description: z.string().default(''),
             manager: z.string(),
+            empresa: z.string(),
             status: projectStatusSchema.default("planning"),
             priority: taskPrioritySchema.default("medium"),
             startDate: z.string().nullable().optional(),
@@ -130,6 +132,7 @@ export const editProjectSchema = projectSchema.pick({
     clientName: true,
     description: true,
 }).extend({
+    empresa: z.string(),
     status: projectStatusSchema.default("planning"),
     priority: taskPrioritySchema.default("medium"),
     startDate: z.string().nullable().optional(),
@@ -150,7 +153,7 @@ export const fullProjectDetailsSchema = projectSchema.extend({
 })
 export type FullProjectDetails = z.infer<typeof fullProjectDetailsSchema>
 
-export type ProjectFormData = Pick<Project, 'clientName' | 'projectName' | 'description'> & { startDate?: string | null, dueDate?: string | null }
+export type ProjectFormData = Pick<Project, 'clientName' | 'projectName' | 'description'> & { empresa: string, startDate?: string | null, dueDate?: string | null }
 
 /* TEAM */
 export const teamMemberSchema = userPerfilSchema.pick({

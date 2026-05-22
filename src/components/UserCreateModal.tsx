@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { userCreateSchema, UserCreateForm, Role } from "../auth/validation";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { createUserByAdmin, getRoles } from "../api/admin.api";
-import SedeSelector from "./SedeSelector";
+import SedeInputTag from "./SedeInputTag";
 import Swal from "sweetalert2";
 
 type UserCreateModalProps = {
@@ -35,7 +35,7 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
       username: "",
       email: "",
       password: "",
-      empresa: "",
+      empresas: [],
       role: "",
     },
   });
@@ -84,10 +84,6 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
       },
       type: "change",
     });
-  };
-
-  const handleSedeChange = (sedeId: string) => {
-    setValue("empresa", sedeId, { shouldValidate: true });
   };
 
   const handleCreate = (formData: UserCreateForm) => {
@@ -268,22 +264,22 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
                           {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
                         </div>
 
-                        {/* Sede */}
+                        {/* Sedes */}
                         <div className="flex flex-col gap-1">
                           <label className="font-medium text-gray-700">
-                            Empresa
+                            Sedes
                           </label>
-                          <SedeSelector
-                            value={watch("empresa") || ""}
-                            onChange={handleSedeChange}
+                          <SedeInputTag
+                            value={watch("empresas") || []}
+                            onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
+                            error={errors.empresas?.message}
                           />
-                          {errors.empresa && <p className="text-sm text-red-600">{errors.empresa.message}</p>}
                         </div>
 
                         {/* Rol */}
                         <div className="flex flex-col gap-1">
                           <label htmlFor="create-role" className="font-medium text-gray-700">
-                            Rol (opcional)
+                            Rol
                           </label>
                           {rolesLoading ? (
                             <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">

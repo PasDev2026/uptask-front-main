@@ -44,7 +44,8 @@ export const userPerfilSchema = authSchema.pick({
     email: true}).extend({
     _id: z.string(),
     dni: z.string().optional(),
-    role: roleSchema.optional()
+    role: roleSchema.optional(),
+    empresas: z.array(z.object({ _id: z.string(), nombre: z.string() })).default([])
 })
 export type User = z.infer<typeof userPerfilSchema>
 export type UserProfileForm = Pick<User, 'name' | 'email'>
@@ -63,7 +64,7 @@ export const userAdminSchema = z.object({
     confirmed: z.boolean(),
     estado: z.boolean(),
     role: roleSchema.optional(),
-    empresa: z.object({ _id: z.string(), nombre: z.string() }).optional().nullable()
+    empresas: z.array(z.object({ _id: z.string(), nombre: z.string() })).default([])
 })
 export type UserAdmin = z.infer<typeof userAdminSchema>
 
@@ -74,7 +75,7 @@ export const userEditSchema = userAdminSchema.omit({ _id: true, confirmed: true,
       .max(8, "El DNI debe tener máximo 8 caracteres")
       .regex(/^\d+$/, "El DNI solo permite números")
       .optional(),
-    empresa: z.string().optional(),
+    empresas: z.array(z.string()).optional(),
     department: z.string()
 })
 export type UserEditForm = z.infer<typeof userEditSchema>
@@ -88,7 +89,7 @@ export type UpdateUserProfilePayload = {
   email?: string
   username?: string
   dni?: string
-  empresa?: string // _id de la sede
+  empresas?: string[] // _ids de las sedes
   role?: string // _id del rol
 }
 
@@ -105,7 +106,7 @@ export const userCreateSchema = z.object({
   username: z.string().min(1, "El username es obligatorio"),
   email: z.string().email("E-mail no válido").optional().or(z.literal("")),
   password: z.string().min(8, "Mínimo 8 caracteres"),
-  empresa: z.string().min(1, "La sede es obligatoria"),
+  empresas: z.array(z.string()).min(1, "Selecciona al menos una sede"),
   role: z.string().optional(),
 })
 export type UserCreateForm = z.infer<typeof userCreateSchema>

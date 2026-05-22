@@ -24,7 +24,7 @@ export default function SearchResult({ user, reset, resetMutation }: SearchResul
       Swal.fire({
         icon: "error",
         title: error.message,
-        text: "Ocurrió un error, El usuario ya pudo estar agregado overifique los datos!",
+        text: "No se pudo agregar el usuario al proyecto",
       });
     },
     onSuccess: (data) => {

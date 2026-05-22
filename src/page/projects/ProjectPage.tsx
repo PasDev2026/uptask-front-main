@@ -15,6 +15,7 @@ export default function ProjectPage() {
     projectName: "",
     clientName: "",
     description: "",
+    empresa: "",
     dueDate: undefined,
   };
 

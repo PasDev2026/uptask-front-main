@@ -143,7 +143,9 @@ export default function UserList() {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <span className="text-sm text-gray-500">
-                      {user.empresa?.nombre || 'Sin asignar'}
+                      {user.empresas && user.empresas.length > 0
+                        ? user.empresas.map(e => e.nombre).join(', ')
+                        : 'Sin asignar'}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">

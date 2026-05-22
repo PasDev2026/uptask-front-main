@@ -6,7 +6,7 @@ import { userEditSchema, UserEditForm, UpdateUserProfilePayload } from "../auth/
 import { getUserById } from "../api/admin.api";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
 import { updateUserProfileApi, getRoles } from "../api/admin.api";
-import SedeSelector from "./SedeSelector";
+import SedeInputTag from "./SedeInputTag";
 import Swal from "sweetalert2";
 import { Role } from "../auth/validation";
 import Spineer from "./Spineer";
@@ -38,7 +38,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
       dni: "",
       email: "",
       username: "",
-      empresa: "",
+      empresas: [],
       department: "",
     },
   });
@@ -54,7 +54,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
         dni: user.dni || "",
         email: user.email,
         username: user.username,
-        empresa: user.empresa?._id || "",
+        empresas: user.empresas?.map(e => e._id) || [],
         department: user.role?._id || user.department || "",
       });
     }
@@ -101,7 +101,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
 
   const handleEdit = (formData: UserEditForm) => {
     if (user) {
-      const { department, dni, empresa, ...rest } = formData;
+      const { department, dni, empresas, ...rest } = formData;
       const payload: UpdateUserProfilePayload = { 
         ...rest, 
         role: department
@@ -111,10 +111,10 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
       if (dni && dni.trim() !== "") {
         payload.dni = dni.trim();
       }
-      
-      // Include empresa only if not empty
-      if (empresa && empresa.trim() !== "") {
-        payload.empresa = empresa.trim();
+
+      // Include empresas only if not empty
+      if (empresas && empresas.length > 0) {
+        payload.empresas = empresas;
       }
       
       mutate({ 
@@ -355,16 +355,16 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
                     />
                   </div>
 
-                  {/* Sede */}
+                  {/* Sedes */}
                   <div className="flex flex-col gap-1">
                     <label className="font-medium text-gray-700">
-                      Sede (opcional)
+                      Sedes
                     </label>
-                    <SedeSelector
-                      value={watch("empresa") || ""}
-                      onChange={(sedeId) => setValue("empresa", sedeId, { shouldValidate: true })}
+                    <SedeInputTag
+                      value={watch("empresas") || []}
+                      onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
+                      error={errors.empresas?.message}
                     />
-                    {errors.empresa && <p className="text-sm text-red-600">{errors.empresa.message}</p>}
                   </div>
 
                    {/* Departamento */}
