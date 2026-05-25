@@ -49,23 +49,17 @@ export default function TaskTableSubtasks({ taskId, projectId, canEdit, depth = 
 
   return (
     <div>
-      {children.length === 0 && !showForm ? (
-        <div className="px-4 py-2 text-xs text-gray-400" style={{ paddingLeft: padLeft }}>
-          Sin subtareas
-        </div>
-      ) : (
-        children.map((child) => (
-          <SubtaskRow
-            key={child._id}
-            subtask={child}
-            projectId={projectId}
-            canEdit={canEdit}
-            depth={depth}
-            projectStartDate={projectStartDate}
-            projectDueDate={projectDueDate}
-          />
-        ))
-      )}
+      {children.map((child) => (
+        <SubtaskRow
+          key={child._id}
+          subtask={child}
+          projectId={projectId}
+          canEdit={canEdit}
+          depth={depth}
+          projectStartDate={projectStartDate}
+          projectDueDate={projectDueDate}
+        />
+      ))}
 
       {canEdit && !showForm && (
         <button

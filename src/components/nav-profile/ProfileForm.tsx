@@ -27,7 +27,7 @@ export default function ProfileForm({ data }: ProfileFormProps) {
       });
     },
     onSuccess: (data) => {
-      Swal.fire(data, "Perfil actualizado correctamente :)", "success");
+      Swal.fire(data.message, " ", "success");
       queryClient.invalidateQueries({queryKey:['user']}) //<- useAuth
     }
   })

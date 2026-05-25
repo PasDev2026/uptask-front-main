@@ -15,13 +15,14 @@ export async function createProject(formData:ProjectFormData) {
     }
 }
 
-export async function getProjects(filters?: { search?: string; dateFrom?: string; dateTo?: string; offset?: number; limit?: number }){
+export async function getProjects(filters?: { search?: string; dateFrom?: string; dateTo?: string; empresa?: string; offset?: number; limit?: number }){
     const token = localStorage.getItem('AUTH_TOKEN')
     try {
         const params: Record<string, string> = {}
         if (filters?.search) params.search = filters.search
         if (filters?.dateFrom) params.dateFrom = filters.dateFrom
         if (filters?.dateTo) params.dateTo = filters.dateTo
+        if (filters?.empresa) params.empresa = filters.empresa
         if (filters?.offset !== undefined) params.offset = String(filters.offset)
         if (filters?.limit !== undefined) params.limit = String(filters.limit)
         const { data } = await api('/dashboard/projects', {

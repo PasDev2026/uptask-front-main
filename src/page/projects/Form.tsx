@@ -1,17 +1,19 @@
-import { FieldErrors, UseFormRegister } from "react-hook-form";
+import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
 import ErrorMsg from "../../components/ErrorMsg";
 import { ProjectFormData } from "../../types";
 import { useQuery } from "@tanstack/react-query";
 import { getSedes } from "../../api/empresa.api";
 import { useAuth } from "../../hooks/useAuth";
+import { useEffect } from "react";
 
 type Form = {
   register: UseFormRegister<ProjectFormData>;
   errors: FieldErrors<ProjectFormData>;
+  setValue?: UseFormSetValue<ProjectFormData>;
   hideEmpresa?: boolean;
 };
 
-export default function Form({ errors, register, hideEmpresa }: Form) {
+export default function Form({ errors, register, setValue, hideEmpresa }: Form) {
   const { data: user } = useAuth();
   const { data: sedes } = useQuery({
     queryKey: ["sedes"],
@@ -20,6 +22,12 @@ export default function Form({ errors, register, hideEmpresa }: Form) {
 
   const userEmpresaIds = user?.empresas?.map(e => e._id) ?? [];
   const sedesFiltradas = sedes?.filter(s => userEmpresaIds.includes(s._id)) ?? [];
+
+  useEffect(() => {
+    if (!hideEmpresa && sedesFiltradas.length === 1 && setValue) {
+      setValue("empresa", sedesFiltradas[0]._id);
+    }
+  }, [hideEmpresa, sedesFiltradas, setValue]);
 
   return (
     <>
@@ -78,10 +86,6 @@ export default function Form({ errors, register, hideEmpresa }: Form) {
           <ErrorMsg>{errors.description.message}</ErrorMsg>
         )}
       </div>
-
-      {!hideEmpresa && sedesFiltradas.length === 1 && (
-        <input type="hidden" {...register("empresa")} value={sedesFiltradas[0]._id} />
-      )}
 
       {!hideEmpresa && sedesFiltradas.length > 1 && (
         <div className="mb-5 space-y-3">

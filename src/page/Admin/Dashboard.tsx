@@ -32,11 +32,13 @@ export default function Dashboard() {
     const { data: user, isLoading: authLoading } = useAuth()
     const [searchParams, setSearchParams] = useSearchParams()
     const [searchInput, setSearchInput] = useState(() => searchParams.get("search") || "")
+    const [empresaInput, setEmpresaInput] = useState(() => searchParams.get("empresa") || "")
     const [dateFromInput, setDateFromInput] = useState(() => searchParams.get("dateFrom") || "")
     const [dateToInput, setDateToInput] = useState(() => searchParams.get("dateTo") || "")
 
     const [debouncedFilters, setDebouncedFilters] = useState({
         search: searchInput,
+        empresa: empresaInput,
         dateFrom: dateFromInput,
         dateTo: dateToInput,
     })
@@ -45,17 +47,20 @@ export default function Dashboard() {
         const timer = setTimeout(() => {
             setDebouncedFilters({
                 search: searchInput,
+                empresa: empresaInput,
                 dateFrom: dateFromInput,
                 dateTo: dateToInput,
             })
         }, 350)
         return () => clearTimeout(timer)
-    }, [searchInput, dateFromInput, dateToInput])
+    }, [searchInput, empresaInput, dateFromInput, dateToInput])
 
     useEffect(() => {
         const next = new URLSearchParams(searchParams)
         if (debouncedFilters.search) next.set("search", debouncedFilters.search)
         else next.delete("search")
+        if (debouncedFilters.empresa) next.set("empresa", debouncedFilters.empresa)
+        else next.delete("empresa")
         if (debouncedFilters.dateFrom) next.set("dateFrom", debouncedFilters.dateFrom)
         else next.delete("dateFrom")
         if (debouncedFilters.dateTo) next.set("dateTo", debouncedFilters.dateTo)
@@ -76,6 +81,7 @@ export default function Dashboard() {
         queryFn: async ({ pageParam }) => {
             const result = await getProjects({
                 search: debouncedFilters.search || undefined,
+                empresa: debouncedFilters.empresa || undefined,
                 dateFrom: debouncedFilters.dateFrom || undefined,
                 dateTo: debouncedFilters.dateTo || undefined,
                 offset: pageParam as number,
@@ -96,10 +102,11 @@ export default function Dashboard() {
     const projects = data?.pages.flatMap(page => page.projects) ?? []
 
     const isSearching = searchInput !== debouncedFilters.search
+        || empresaInput !== debouncedFilters.empresa
         || dateFromInput !== debouncedFilters.dateFrom
         || dateToInput !== debouncedFilters.dateTo
 
-    const hasActiveFilters = debouncedFilters.search || debouncedFilters.dateFrom || debouncedFilters.dateTo
+    const hasActiveFilters = debouncedFilters.search || debouncedFilters.empresa || debouncedFilters.dateFrom || debouncedFilters.dateTo
 
     const dateRangeLabel = dateFromInput && dateToInput
         ? `${formatDateShort(dateFromInput)} \u2192 ${formatDateShort(dateToInput)}`
@@ -111,6 +118,7 @@ export default function Dashboard() {
 
     const clearAllFilters = () => {
         setSearchInput("")
+        setEmpresaInput("")
         setDateFromInput("")
         setDateToInput("")
     }
@@ -149,6 +157,16 @@ export default function Dashboard() {
                         )}
                     </div>
 
+                    <select
+                        value={empresaInput}
+                        onChange={(e) => setEmpresaInput(e.target.value)}
+                        className="shrink-0 px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white shadow-sm text-slate-600 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-colors"
+                    >
+                        <option value="">Todas las sedes</option>
+                        {user.empresas?.map((e) => (
+                            <option key={e._id} value={e._id}>{e.nombre}</option>
+                        ))}
+                    </select>
                     <Popover className="relative shrink-0">
                         <PopoverButton className="flex items-center gap-2 px-3 py-2.5 text-sm border border-slate-200 rounded-lg bg-white shadow-sm text-slate-600 hover:text-slate-800 hover:border-slate-300 focus:outline-none focus:ring-2 focus:ring-brand-primary/20 focus:border-brand-primary transition-colors">
                             <CalendarDaysIcon className="h-5 w-5 text-slate-400" />
@@ -201,7 +219,7 @@ export default function Dashboard() {
                         </PopoverPanel>
                     </Popover>
 
-                    {(searchInput || dateFromInput || dateToInput) && (
+                    {(searchInput || empresaInput || dateFromInput || dateToInput) && (
                         <button
                             onClick={clearAllFilters}
                             className="flex items-center gap-1.5 px-3 py-2.5 text-sm text-slate-500 hover:text-slate-700 transition-colors shrink-0"
@@ -238,6 +256,9 @@ export default function Dashboard() {
                         )}
                         {(debouncedFilters.dateFrom || debouncedFilters.dateTo) && (
                             <> en el rango de fechas seleccionado</>
+                        )}
+                        {debouncedFilters.empresa && (
+                            <> en la sede seleccionada</>
                         )}
                     </p>
                 ) : (

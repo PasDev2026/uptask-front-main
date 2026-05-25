@@ -103,7 +103,9 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
             {subtask.name}
           </span>
         </div>
-
+        <div>
+            {/* column de empresa o sede, por ahora vacia */}
+        </div>
         <div className="flex items-center">
           <TaskStatusPopover
             status={subtask.status}
@@ -156,12 +158,6 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
 
       {expanded && (
         <div>
-          {children.length === 0 && !showForm && (
-            <div className="px-4 py-2 text-xs text-gray-400" style={{ paddingLeft: childPad }}>
-              Sin subtareas
-            </div>
-          )}
-
           {children.map((child: Task) => (
             <SubtaskRow
               key={child._id}

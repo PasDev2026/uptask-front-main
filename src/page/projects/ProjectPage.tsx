@@ -19,7 +19,7 @@ export default function ProjectPage() {
     dueDate: undefined,
   };
 
-  const {register, handleSubmit, formState: { errors }} = useForm({ defaultValues: initialValues });
+  const {register, handleSubmit, formState: { errors }, setValue} = useForm({ defaultValues: initialValues });
 
   const mutatiton = useMutation({
       mutationFn: createProject,
@@ -53,6 +53,7 @@ export default function ProjectPage() {
         <Form
           register={register}
           errors={errors}
+          setValue={setValue}
         />
 
         <button

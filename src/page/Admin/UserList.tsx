@@ -79,6 +79,9 @@ export default function UserList() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Rol
                   </th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                    Área
+                  </th>
                   {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                     Correo
                   </th> */}
@@ -117,6 +120,13 @@ export default function UserList() {
                         : 'bg-green-100 text-green-800'
                     }`}>
                       {user.role?.name || 'Sin rol'}
+                    </span>
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                      {user.area?.name
+                        ? user.area.name.charAt(0).toUpperCase() + user.area.name.slice(1)
+                        : 'Sin área'}
                     </span>
                   </td>
                   {/* <td className="px-6 py-4 whitespace-nowrap">

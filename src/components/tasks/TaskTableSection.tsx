@@ -110,7 +110,6 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
     return (
       <div className="border-t border-slate-100">
         <div className="px-4 py-3">
-          <p className="text-xs text-gray-400 mb-2">No hay tareas en este proyecto</p>
           {canEdit && (
             <button
               onClick={() => setShowForm(true)}
@@ -198,6 +197,9 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
               >
                 {task.name}
               </Link>
+            </div>
+            <div>
+              {/* column de empresa o sede, por ahora vacia */}
             </div>
 
             <div className="flex items-center">

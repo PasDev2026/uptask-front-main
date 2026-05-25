@@ -102,6 +102,12 @@ export const projectSchema = z.object({
     startDate: z.string().nullable().optional(),
 })
 
+export const empresaInfoSchema = z.object({
+    _id: z.string(),
+    nombre: z.string(),
+})
+export type EmpresaInfo = z.infer<typeof empresaInfoSchema>
+
 export const dashboardProjectsSchema = z.object({
     projects: z.array(
         z.object({
@@ -110,7 +116,7 @@ export const dashboardProjectsSchema = z.object({
             projectName: z.string(),
             description: z.string().default(''),
             manager: z.string(),
-            empresa: z.string(),
+            empresa: empresaInfoSchema,
             status: projectStatusSchema.default("planning"),
             priority: taskPrioritySchema.default("medium"),
             startDate: z.string().nullable().optional(),

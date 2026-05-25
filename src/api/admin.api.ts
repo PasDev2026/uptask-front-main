@@ -1,6 +1,6 @@
 import { isAxiosError } from "axios";
 import api from "../lib/axios";
-import { UserAdmin, UpdateUserProfilePayload, UserCreateForm, Role } from "../auth/validation/index";
+import { UserAdmin, UpdateUserProfilePayload, UserCreateForm, Role, Area } from "../auth/validation/index";
 
 export async function getAllUsers() {
     const token = localStorage.getItem('AUTH_TOKEN')
@@ -11,7 +11,7 @@ export async function getAllUsers() {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }
@@ -27,7 +27,7 @@ export async function updateUserStatus(userId: string, estado: boolean) {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }
@@ -43,7 +43,7 @@ export async function updateUserProfileApi(userId: string, data: UpdateUserProfi
         return responseData
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }
@@ -57,7 +57,21 @@ export async function getRoles() {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
+        }
+    }
+}
+
+export async function getAreas() {
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
+        const { data } = await api<Area[]>('/auth/areas', {
+            headers: { Authorization: `Bearer ${token}` }
+        })
+        return data
+    } catch (error) {
+        if(isAxiosError(error) && error.response){
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }
@@ -71,7 +85,7 @@ export async function createUserByAdmin(data: UserCreateForm) {
         return responseData
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }
@@ -85,7 +99,7 @@ export async function getUserById(userId: string) {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            throw new Error(error.response.data.error || error.response.data.message);
         }
     }
 }

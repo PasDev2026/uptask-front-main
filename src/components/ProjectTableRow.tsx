@@ -66,6 +66,12 @@ export default function ProjectTableRow({ project, user }: ProjectTableRowProps)
                         </div>
 
                         <div className="flex items-center">
+                            <span className="shrink-0 text-[11px] font-semibold uppercase bg-slate-100 text-slate-600 border border-slate-300 rounded-full px-2.5 py-0.5">
+                                {project.empresa?.nombre ?? ""}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center">
                             <StatusPopover
                                 status={project.status}
                                 onSelect={(s) => updateProjectStatus.mutate({ projectId: project._id, status: s })}

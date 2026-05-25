@@ -26,11 +26,11 @@ export default function ChangePasswordProfile() {
       Swal.fire({
         icon: "error",
         title: error.message,
-        text: "Ocurrió un error, verifique los datos!",
+        text: "El password actual es incorrecto, verifique los datos!",
       });
     },
     onSuccess: (data) => {
-      Swal.fire(data, "Password actualizado correctamente :)", "success")
+      Swal.fire(data.message, " ", "success")
     },
   });
 

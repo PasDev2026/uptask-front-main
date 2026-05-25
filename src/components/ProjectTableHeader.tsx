@@ -8,6 +8,7 @@ export default function ProjectTableHeader() {
     >
       <div />
       <div>Proyecto</div>
+      <div>Sede</div>
       <div>Estado</div>
       <div>Responsable</div>
       <div>Prioridad</div>

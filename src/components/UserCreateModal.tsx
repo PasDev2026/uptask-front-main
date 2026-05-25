@@ -2,9 +2,9 @@ import { Fragment, useState } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { userCreateSchema, UserCreateForm, Role } from "../auth/validation";
+import { userCreateSchema, UserCreateForm, Role, Area } from "../auth/validation";
 import { useMutation, useQueryClient, useQuery } from "@tanstack/react-query";
-import { createUserByAdmin, getRoles } from "../api/admin.api";
+import { createUserByAdmin, getRoles, getAreas } from "../api/admin.api";
 import SedeInputTag from "./SedeInputTag";
 import Swal from "sweetalert2";
 
@@ -24,6 +24,12 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
     enabled: isOpen,
   });
 
+  const { data: areas, isLoading: areasLoading, isError: areasError } = useQuery({
+    queryKey: ["areas"],
+    queryFn: getAreas,
+    enabled: isOpen,
+  });
+
   const { register, handleSubmit, reset, watch, setValue, formState: { errors, isSubmitting } } = useForm<UserCreateForm>({
     resolver: zodResolver(userCreateSchema),
     defaultValues: {
@@ -37,6 +43,7 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
       password: "",
       empresas: [],
       role: "",
+      area: "",
     },
   });
 
@@ -52,6 +59,18 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
     onError: (error) => {
       if (error.message.includes("DNI ya está en uso")) {
         setDniError("El DNI ya está en uso");
+      } else if (error.message.includes("email ya está en uso")) {
+        Swal.fire({
+          icon: "error",
+          title: "Email en uso",
+          text: "El correo electrónico ya está registrado",
+        });
+      } else if (error.message.includes("username ya esta en uso")) {
+        Swal.fire({
+          icon: "error",
+          title: "Username en uso",
+          text: "El nombre de usuario ya está registrado",
+        });
       } else {
         Swal.fire({
           icon: "error",
@@ -94,6 +113,9 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
     }
     if (!payload.role) {
       delete payload.role;
+    }
+    if (!payload.area) {
+      delete payload.area;
     }
 
     mutate(payload);
@@ -210,6 +232,17 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
                           />
                           {errors.telefono && <p className="text-sm text-red-600">{errors.telefono.message}</p>}
                         </div>
+                        {/* Sedes */}
+                        <div className="flex flex-col gap-1">
+                          <label className="font-medium text-gray-700">
+                            Sedes
+                          </label>
+                          <SedeInputTag
+                            value={watch("empresas") || []}
+                            onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
+                            error={errors.empresas?.message}
+                          />
+                        </div>
                       </div>
 
                       <div className="space-y-4">
@@ -264,17 +297,7 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
                           {errors.password && <p className="text-sm text-red-600">{errors.password.message}</p>}
                         </div>
 
-                        {/* Sedes */}
-                        <div className="flex flex-col gap-1">
-                          <label className="font-medium text-gray-700">
-                            Sedes
-                          </label>
-                          <SedeInputTag
-                            value={watch("empresas") || []}
-                            onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
-                            error={errors.empresas?.message}
-                          />
-                        </div>
+                        
 
                         {/* Rol */}
                         <div className="flex flex-col gap-1">
@@ -299,6 +322,35 @@ export default function UserCreateModal({ isOpen, onClose }: UserCreateModalProp
                               {roles?.map((role: Role) => (
                                 <option key={role._id} value={role._id}>
                                   {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                                </option>
+                              ))}
+                            </select>
+                          )}
+                        </div>
+
+                        {/* Área */}
+                        <div className="flex flex-col gap-1">
+                          <label htmlFor="create-area" className="font-medium text-gray-700">
+                            Área
+                          </label>
+                          {areasLoading ? (
+                            <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
+                              Cargando áreas...
+                            </div>
+                          ) : areasError ? (
+                            <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 text-red-600 text-sm">
+                              Error al cargar las áreas
+                            </div>
+                          ) : (
+                            <select
+                              id="create-area"
+                              className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                              {...register("area")}
+                            >
+                              <option value="">-- Seleccione una opcion --</option>
+                              {areas?.map((area: Area) => (
+                                <option key={area._id} value={area._id}>
+                                  {area.name.charAt(0).toUpperCase() + area.name.slice(1)}
                                 </option>
                               ))}
                             </select>

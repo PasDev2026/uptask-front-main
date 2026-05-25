@@ -39,12 +39,19 @@ export const roleSchema = z.object({
 })
 export type Role = z.infer<typeof roleSchema>
 
+export const areaSchema = z.object({
+    _id: z.string(),
+    name: z.string()
+})
+export type Area = z.infer<typeof areaSchema>
+
 export const userPerfilSchema = authSchema.pick({ 
     name: true, 
     email: true}).extend({
     _id: z.string(),
     dni: z.string().optional(),
     role: roleSchema.optional(),
+    area: areaSchema.optional(),
     empresas: z.array(z.object({ _id: z.string(), nombre: z.string() })).default([])
 })
 export type User = z.infer<typeof userPerfilSchema>
@@ -64,6 +71,7 @@ export const userAdminSchema = z.object({
     confirmed: z.boolean(),
     estado: z.boolean(),
     role: roleSchema.optional(),
+    area: areaSchema.optional(),
     empresas: z.array(z.object({ _id: z.string(), nombre: z.string() })).default([])
 })
 export type UserAdmin = z.infer<typeof userAdminSchema>
@@ -76,7 +84,8 @@ export const userEditSchema = userAdminSchema.omit({ _id: true, confirmed: true,
       .regex(/^\d+$/, "El DNI solo permite números")
       .optional(),
     empresas: z.array(z.string()).optional(),
-    department: z.string()
+    department: z.string(),
+    area: z.string().optional(),
 })
 export type UserEditForm = z.infer<typeof userEditSchema>
 
@@ -91,6 +100,7 @@ export type UpdateUserProfilePayload = {
   dni?: string
   empresas?: string[] // _ids de las sedes
   role?: string // _id del rol
+  area?: string // _id del área
 }
 
 /* Admin - User create */
@@ -108,5 +118,6 @@ export const userCreateSchema = z.object({
   password: z.string().min(8, "Mínimo 8 caracteres"),
   empresas: z.array(z.string()).min(1, "Selecciona al menos una sede"),
   role: z.string().optional(),
+  area: z.string().optional(),
 })
 export type UserCreateForm = z.infer<typeof userCreateSchema>
