@@ -16,10 +16,13 @@ export default function UserList() {
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
   const [resetPasswordUserId, setResetPasswordUserId] = useState<{ id: string; name: string } | null>(null)
+  const [page, setPage] = useState(1)
+  const PAGE_SIZE = 10
+  const offset = (page - 1) * PAGE_SIZE
 
   const { data, isLoading, isError } = useQuery({
-    queryKey: ["users"],
-    queryFn: getAllUsers,
+    queryKey: ["users", { offset, limit: PAGE_SIZE }],
+    queryFn: () => getAllUsers(offset, PAGE_SIZE),
     retry: false,
   });
 
@@ -61,7 +64,7 @@ export default function UserList() {
         Crear Usuario
       </button>
 
-      {data && data.length ? (
+      {data && data.users.length ? (
         <div className="mt-10 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
           <table className="min-w-full divide-y divide-gray-200">
               <thead className="bg-gray-50">
@@ -99,7 +102,7 @@ export default function UserList() {
                 </tr>
               </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {data.map((user) => (
+              {data.users.map((user) => (
                 <tr key={user._id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm font-medium text-gray-900">
@@ -184,6 +187,27 @@ export default function UserList() {
               ))}
             </tbody>
           </table>
+          <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200">
+            <p className="text-sm text-gray-500">
+              Mostrando {offset + 1}–{Math.min(page * PAGE_SIZE, data.total)} de {data.total} usuarios
+            </p>
+            <div className="flex gap-2">
+              <button
+                disabled={page === 1}
+                onClick={() => setPage((p) => p - 1)}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                ← Anterior
+              </button>
+              <button
+                disabled={page * PAGE_SIZE >= data.total}
+                onClick={() => setPage((p) => p + 1)}
+                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+              >
+                Siguiente →
+              </button>
+            </div>
+          </div>
         </div>
       ) : (
         <p className="text-2xl font-light text-gray-500 mt-5">

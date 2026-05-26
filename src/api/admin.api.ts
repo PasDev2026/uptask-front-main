@@ -2,12 +2,13 @@ import { isAxiosError } from "axios";
 import api from "../lib/axios";
 import { UserAdmin, UpdateUserProfilePayload, UserCreateForm, Role, Area } from "../auth/validation/index";
 
-export async function getAllUsers() {
+export async function getAllUsers(offset: number = 0, limit: number = 10) {
     const token = localStorage.getItem('AUTH_TOKEN')
     try {
-        const { data } = await api<UserAdmin[]>('/auth/users', {
-            headers: { Authorization: `Bearer ${token}` }
-        })
+        const { data } = await api<{ users: UserAdmin[]; total: number; offset: number; limit: number }>(
+            `/auth/users?offset=${offset}&limit=${limit}`,
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){

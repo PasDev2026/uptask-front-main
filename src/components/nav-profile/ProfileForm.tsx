@@ -38,54 +38,52 @@ export default function ProfileForm({ data }: ProfileFormProps) {
 
   return (
     <>
-      <div className="mx-auto max-w-3xl g">
-        <h1 className="text-5xl font-black ">Mi Perfil</h1>
-        <p className="text-2xl font-light text-gray-500 mt-5">
-          Aquí puedes actualizar tu información
+      <div className="mx-auto max-w-2xl">
+        <h1 className="text-2xl font-semibold text-gray-900">Mi Perfil</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Actualiza tu información personal
         </p>
 
         <form
           onSubmit={handleSubmit(handleEditProfile)}
-          className=" mt-14 space-y-5  bg-white shadow-lg p-10 rounded-l"
+          className="mt-10 space-y-6"
           noValidate
         >
-          <div className="mb-5 space-y-3">
-            <label className="text-sm uppercase font-bold" htmlFor="name">
+          <div>
+            <label className="text-sm font-medium text-gray-700" htmlFor="name">
               Nombre
             </label>
             <input
               id="name"
               type="text"
-              placeholder="Tu Nombre"
-              className="w-full p-3  border border-gray-200"
+              className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none"
               {...register("name", {
-                required: "Nombre de usuario es obligatoro",
+                required: "Nombre de usuario es obligatorio",
               })}
             />
-            {errors.name && <p>{errors.name.message}</p>}
+            {errors.name && <p className="text-xs text-red-500 mt-1">{errors.name.message}</p>}
           </div>
 
-          <div className="mb-5 space-y-3">
-            <label className="text-sm uppercase font-bold">
+          <div>
+            <label className="text-sm font-medium text-gray-700">
               DNI
             </label>
             <input
               type="text"
               value={data.dni || 'No registrado'}
-              className="w-full p-3 border border-gray-200 bg-gray-50"
+              className="mt-1 block w-full border border-gray-200 rounded-lg px-3 py-2.5 text-gray-500 bg-gray-50"
               disabled
             />
           </div>
 
-          <div className="mb-5 space-y-3">
-            <label className="text-sm uppercase font-bold" htmlFor="password">
-              E-mail
+          <div>
+            <label className="text-sm font-medium text-gray-700" htmlFor="email">
+              Correo electrónico
             </label>
             <input
-              id="text"
+              id="email"
               type="email"
-              placeholder="Tu Email"
-              className="w-full p-3  border border-gray-200"
+              className="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2.5 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none"
               {...register("email", {
                 required: "EL e-mail es obligatorio",
                 pattern: {
@@ -94,13 +92,15 @@ export default function ProfileForm({ data }: ProfileFormProps) {
                 },
               })}
             />
-            {errors.email && <p>{errors.email.message}</p>}
+            {errors.email && <p className="text-xs text-red-500 mt-1">{errors.email.message}</p>}
           </div>
-          <input
+
+          <button
             type="submit"
-            value="Guardar Cambios"
-            className="bg-brand-primary w-full p-3 text-white uppercase font-bold hover:bg-brand-dark cursor-pointer transition-colors"
-          />
+            className="w-full rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark transition-colors"
+          >
+            Guardar Cambios
+          </button>
         </form>
       </div>
     </>

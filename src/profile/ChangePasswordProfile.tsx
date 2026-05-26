@@ -45,30 +45,29 @@ export default function ChangePasswordProfile() {
 
   return (
     <>
-      <div className="mx-auto max-w-3xl">
-        <h1 className="text-5xl font-black ">Cambiar Password</h1>
-        <p className="text-2xl font-light text-gray-500 mt-5">
-          Utiliza este formulario para cambiar tu password
+      <div className="mx-auto max-w-2xl">
+        <h1 className="text-2xl font-semibold text-gray-900">Cambiar Password</h1>
+        <p className="text-sm text-gray-500 mt-1">
+          Actualiza tu contraseña
         </p>
 
         <form
           onSubmit={handleSubmit(handleChangePassword)}
-          className=" mt-14 space-y-5 bg-white shadow-lg p-10 rounded-lg"
+          className="mt-10 space-y-6"
           noValidate
         >
-          <div className="mb-5 space-y-3">
+          <div>
             <label
-              className="text-sm uppercase font-bold"
+              className="text-sm font-medium text-gray-700"
               htmlFor="current_password"
             >
-              Password Actual
+              Contraseña actual
             </label>
-            <div className="relative">
+            <div className="relative mt-1">
               <input
                 id="current_password"
                 type={showPasswords.current_password ? "text" : "password"}
-                placeholder="Password Actual"
-                className="w-full p-3 border border-gray-200 pr-10"
+                className="block w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none"
                 {...register("current_password", {
                   required: "El password actual es obligatorio",
                 })}
@@ -91,20 +90,19 @@ export default function ChangePasswordProfile() {
               </button>
             </div>
             {errors.current_password && (
-              <p>{errors.current_password.message}</p>
+              <p className="text-xs text-red-500 mt-1">{errors.current_password.message}</p>
             )}
           </div>
 
-          <div className="mb-5 space-y-3">
-            <label className="text-sm uppercase font-bold" htmlFor="password">
-              Nuevo Password
+          <div>
+            <label className="text-sm font-medium text-gray-700" htmlFor="password">
+              Nueva contraseña
             </label>
-            <div className="relative">
+            <div className="relative mt-1">
               <input
                 id="password"
                 type={showPasswords.password ? "text" : "password"}
-                placeholder="Nuevo Password"
-                className="w-full p-3 border border-gray-200 pr-10"
+                className="block w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none"
                 {...register("password", {
                   required: "El Nuevo Password es obligatorio",
                   minLength: {
@@ -130,22 +128,22 @@ export default function ChangePasswordProfile() {
                 )}
               </button>
             </div>
-            {errors.password && <p>{errors.password.message}</p>}
+            {errors.password && <p className="text-xs text-red-500 mt-1">{errors.password.message}</p>}
           </div>
-          <div className="mb-5 space-y-3">
+
+          <div>
             <label
               htmlFor="password_confirmation"
-              className="text-sm uppercase font-bold"
+              className="text-sm font-medium text-gray-700"
             >
-              Repetir Password
+              Repetir contraseña
             </label>
 
-            <div className="relative">
+            <div className="relative mt-1">
               <input
                 id="password_confirmation"
                 type={showPasswords.password_confirmation ? "text" : "password"}
-                placeholder="Repetir Password"
-                className="w-full p-3 border border-gray-200 pr-10"
+                className="block w-full border border-gray-300 rounded-lg px-3 py-2.5 pr-10 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary focus:outline-none"
                 {...register("password_confirmation", {
                   required: "Este campo es obligatorio",
                   validate: (value) =>
@@ -170,15 +168,16 @@ export default function ChangePasswordProfile() {
               </button>
             </div>
             {errors.password_confirmation && (
-              <p>{errors.password_confirmation.message}</p>
+              <p className="text-xs text-red-500 mt-1">{errors.password_confirmation.message}</p>
             )}
           </div>
 
-          <input
+          <button
             type="submit"
-            value="Cambiar Password"
-            className="bg-brand-primary w-full p-3 text-white uppercase font-bold hover:bg-brand-dark cursor-pointer transition-colors"
-          />
+            className="w-full rounded-lg bg-brand-primary px-4 py-2.5 text-sm font-medium text-white hover:bg-brand-dark transition-colors"
+          >
+            Cambiar Password
+          </button>
         </form>
       </div>
     </>

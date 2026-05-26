@@ -5,10 +5,13 @@ import { UserCircleIcon, FolderIcon, UsersIcon, ArrowRightOnRectangleIcon } from
 
 type SidebarProps = {
   name: User['name']
+  apellido_paterno: User['apellido_paterno']
+  email?: User['email']
   role?: User['role']
+  area?: User['area']
 }
 
-export default function Sidebar({ name, role }: SidebarProps) {
+export default function Sidebar({ name, apellido_paterno, email, role, area }: SidebarProps) {
 
   const queryClient = useQueryClient()
   const navigate = useNavigate()
@@ -34,16 +37,22 @@ export default function Sidebar({ name, role }: SidebarProps) {
             TODOLIST
           </span> */}
         </a>
+        
+      </div>
+      <div className="p-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-primary/80 to-brand-primary flex items-center justify-center text-white font-bold text-sm shadow-sm">
             {name.charAt(0)}
           </div>
           <div className="min-w-0">
-            <p className="text-sm font-semibold text-gray-800 dark:text-gray-200 truncate">
-              {name}
+            <p className="text-md font-semibold text-gray-800 dark:text-gray-200 truncate">
+              {name} {apellido_paterno}
             </p>
-            <p className="text-xs text-gray-500 dark:text-gray-400">
-              Bienvenido de vuelta
+            <p className="text-xs font-semibold text-gray-500 dark:text-gray-400 truncate">
+              {email}
+            </p>
+            <p className="text-xs text-gray-500 dark:text-gray-400 uppercase">
+              {area?.name || 'Sin área'}
             </p>
           </div>
         </div>

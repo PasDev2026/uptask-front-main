@@ -47,6 +47,7 @@ export type Area = z.infer<typeof areaSchema>
 
 export const userPerfilSchema = authSchema.pick({ 
     name: true, 
+    apellido_paterno: true,
     email: true}).extend({
     _id: z.string(),
     dni: z.string().optional(),
