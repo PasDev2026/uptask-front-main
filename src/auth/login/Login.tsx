@@ -1,7 +1,9 @@
+import { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { UserLoginForm } from "../validation";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { authenticate } from "../../api/auth.api";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { useMutation } from "@tanstack/react-query";
 import Swal from "sweetalert2";
 
@@ -9,9 +11,22 @@ import Swal from "sweetalert2";
 
 export default function Login() {
 
+  const [showPassword, setShowPassword] = useState(false)
   const initialValues: UserLoginForm = {username: '',password: ''}
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: initialValues })
   const navigate = useNavigate()
+  const [searchParams] = useSearchParams()
+
+  useEffect(() => {
+    if (searchParams.get('inactivo') === 'true') {
+      Swal.fire({
+        icon: 'info',
+        title: 'Cuenta desactivada',
+        text: 'Tu cuenta ha sido desactivada por un administrador. No puedes continuar en el sistema.',
+        confirmButtonColor: '#2DAAA5'
+      })
+    }
+  }, [])
   
   const {mutate} = useMutation({
     mutationFn: authenticate,
@@ -64,14 +79,23 @@ export default function Login() {
             className="font-normal text-2xl"
           >Contraseña</label>
 
-          <input
-            type="password"
-            placeholder="Ingresa tu contraseña"
-            className="w-full p-3  border-gray-300 border"
-            {...register("password", {
-              required: "El Password es obligatorio",
-            })}
-          />
+          <div className="relative">
+            <input
+              type={showPassword ? "text" : "password"}
+              placeholder="Ingresa tu contraseña"
+              className="w-full p-3 pr-10 border-gray-300 border"
+              {...register("password", {
+                required: "El Password es obligatorio",
+              })}
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword(!showPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
+              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+            </button>
+          </div>
           {errors.password && (
             <p>{errors.password.message}</p>
           )}

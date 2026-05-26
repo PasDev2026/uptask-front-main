@@ -4,6 +4,7 @@ import Sidebar from "./Sidebar";
 import Footer from "./Footer";
 import { useAuth } from "../hooks/useAuth";
 import Spineer from "../components/Spineer";
+import SocketManager from "../components/SocketManager";
 
 export default function AppLayout() {
   
@@ -15,6 +16,7 @@ export default function AppLayout() {
   
   if(data) return (
     <div>
+        <SocketManager />
         <Sidebar name={data.name} role={data.role} />
         <div className="ml-64">
             <Header />

@@ -1,11 +1,12 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { PencilIcon } from "@heroicons/react/20/solid"
+import { KeyIcon, PencilIcon } from "@heroicons/react/20/solid"
 import { getAllUsers, updateUserStatus } from "../../api/admin.api";
 import Spineer from "../../components/Spineer";
 import UserStatusModal from "../../components/UserStatusModal";
 import UserEditModal from "../../components/UserEditModal";
 import UserCreateModal from "../../components/UserCreateModal";
+import ResetPasswordModal from "../../components/ResetPasswordModal";
 import { UserAdmin } from "../../auth/validation";
 
 export default function UserList() {
@@ -14,6 +15,7 @@ export default function UserList() {
   const [selectedUser, setSelectedUser] = useState<UserAdmin | null>(null)
   const [editingUserId, setEditingUserId] = useState<string | null>(null)
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false)
+  const [resetPasswordUserId, setResetPasswordUserId] = useState<{ id: string; name: string } | null>(null)
 
   const { data, isLoading, isError } = useQuery({
     queryKey: ["users"],
@@ -54,7 +56,7 @@ export default function UserList() {
 
       <button
         onClick={() => setIsCreateModalOpen(true)}
-        className="mb-4 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-dark transition-colors"
+        className="mb-4 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/80 transition-colors"
       >
         Crear Usuario
       </button>
@@ -168,6 +170,14 @@ export default function UserList() {
                       >
                         <PencilIcon className="h-5 w-5" />
                       </button>
+                      <button
+                        type="button"
+                        onClick={() => setResetPasswordUserId({ id: user._id, name: `${user.name} ${user.apellido_paterno}` })}
+                        className="p-1 text-gray-600 hover:text-gray-900 transition-colors"
+                        title="Restablecer contraseña"
+                      >
+                        <KeyIcon className="h-5 w-5" />
+                      </button>
                     </div>
                   </td>
                 </tr>
@@ -201,6 +211,13 @@ export default function UserList() {
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />
+      {resetPasswordUserId && (
+        <ResetPasswordModal
+          userId={resetPasswordUserId.id}
+          userName={resetPasswordUserId.name}
+          onClose={() => setResetPasswordUserId(null)}
+        />
+      )}
     </div>
   );
 }

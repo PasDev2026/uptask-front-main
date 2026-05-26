@@ -32,6 +32,7 @@
     "react-dom": "^18.3.1",
     "react-hook-form": "^7.54.1",
     "react-router-dom": "^7.0.2",
+    "socket.io-client": "^4.8.3",
     "sweetalert2": "^11.15.2",
     "zod": "^3.24.1"
   },

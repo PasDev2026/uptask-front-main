@@ -458,7 +458,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-medium rounded-lg transition-colors"
+                      className="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-medium rounded-lg hover:bg-brand-primary/80 transition-colors"
                     >
                       Guardar cambios
                     </button>

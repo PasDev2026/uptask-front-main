@@ -103,3 +103,20 @@ export async function getUserById(userId: string) {
         }
     }
 }
+
+export async function resetUserPassword(userId: string, password: string) {
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
+        const { data } = await api.patch<{ message: string }>(
+            `/auth/users/${userId}/reset-password`,
+            { password },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error || error.response.data.message)
+        }
+        throw new Error('Error de conexión con el servidor')
+    }
+}

@@ -6,13 +6,13 @@ export default function Header() {
 
 
   return (
-    <header className="bg-white border-b border-gray-200 dark:bg-gray-900">
+    <header className="sticky top-0 z-10 bg-white border-b border-gray-200 dark:bg-gray-900">
       <nav className="max-w-screen-xl mx-auto p-4">
         <div className="flex justify-end">
           <button
               type="button"
               onClick={() => navigate("/projects/create")}
-              className="inline-flex items-center gap-2 rounded-lg bg-brand-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-primary/90"
+              className="inline-flex items-center gap-2 rounded-lg bg-brand-primary px-4 py-2 text-sm font-medium text-white shadow-sm transition-colors hover:bg-brand-primary/80"
             >
               <PlusIcon className="h-4 w-4" />
               Nuevo Proyecto

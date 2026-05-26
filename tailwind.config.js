@@ -1,4 +1,6 @@
 /** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   content: [
     "./index.html",
@@ -7,6 +9,9 @@ module.exports = {
   ],
   theme: {
     extend: {
+      fontFamily: {
+        sans: ['Nunito', ...defaultTheme.fontFamily.sans],
+      },
       colors: {
         brand: {
           primary: '#2DAAA5',

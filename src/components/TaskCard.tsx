@@ -15,8 +15,8 @@ type TaskCardProps = {
 };
 
 export default function TaskCard({ task, canEdit }: TaskCardProps) {
-  const {attributes ,listeners, setNodeRef, transform} = useDraggable({
-    id: task._id //<- que tarea estoy arrastrando hacia que estado
+  const {attributes ,listeners, setNodeRef} = useDraggable({
+    id: task._id
   });
 
   const navigate = useNavigate();
@@ -43,23 +43,12 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
   })
 
 
-  const style = transform ?  {
-    transform: `translate3d(${transform.x}px, ${transform.y}px, 0)`,  
-    padding: "1.25rem",
-    backgroundColor: '#FFF',
-    width: '300px',
-    displey: 'flex',
-    borderWidth: '1px',
-    borderColor: 'rgb(203,213,225 / var(--tw-border-opacity))'
-  } : undefined
-
   return (
     <li className="p-5 bg-white border border-slate-300 flex justify-between">
       <div 
         {...listeners}
         {...attributes}
         ref={setNodeRef}
-        style={style}
       className="min-w-0 flex flex-col gap-y-4">
         <div className="flex items-center gap-2">
           <p

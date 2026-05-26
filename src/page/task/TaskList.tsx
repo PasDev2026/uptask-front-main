@@ -1,7 +1,8 @@
-import { DndContext, DragEndEvent } from "@dnd-kit/core";
+import { useState } from "react";
+import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import TaskCard from "../../components/TaskCard";
 import { statusTranslation } from "../../traductor/es";
-import { Project, TaskProject, TaskStatus, StatusChangeResponse, ProjectsResponse } from "../../types";
+import { TaskProject, TaskStatus, StatusChangeResponse, ProjectsResponse } from "../../types";
 import DropTask from "./DropTask";
 import { updateStatusTask } from "../../api/task.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -39,6 +40,7 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
   const params = useParams()
   const projectId  = params.projectId!
   const queryClient = useQueryClient()
+  const [activeTask, setActiveTask] = useState<TaskProject | null>(null)
 
   //Aqui se maneja el esatdo de las tareas
   const { mutate } = useMutation<StatusChangeResponse, Error, { projectId: string; taskId: string; status: TaskStatus }>({
@@ -90,30 +92,20 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
 /* 
   console.log(groupedTasks); */
 
+  const handleDragStart = (e: DragStartEvent) => {
+    const taskId = e.active.id.toString()
+    const task = tasks.find(t => t._id === taskId)
+    if (task) setActiveTask(task)
+  }
+
   const handleDragEnd = (e : DragEndEvent) => {
+    setActiveTask(null)
     const {over ,  active} = e
     
     if(over && over.id) {
       const taskId = active.id.toString()
       const status = over.id as TaskStatus
       mutate({projectId,taskId, status})
-      
-      queryClient.setQueryData(['project', projectId], (prevData: Project) => {
-        const updatedTasks = prevData.tasks.map((task) => {
-            if(task._id === taskId){
-              return  {...task,status} //solo me interersa la tarjeta que estoy cambiando y lo demas mantenerlo
-            }
-            return task
-        })
-
-        return {
-          ...prevData,
-          tasks: updatedTasks
-        }
-      })
-
-      
-
     }
     
   } 
@@ -123,7 +115,7 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
 
       <div className="flex gap-5 overflow-x-scroll 2xl:overflow-auto pb-32">
 
-        <DndContext onDragEnd={handleDragEnd}>
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
           {Object.entries(groupedTasks).map(([status, tasks]) => (
             <div key={status} className="min-w-[300px] 2xl:min-w-0 2xl:w-1/5">
               <ul className="mt-5 space-y-5">
@@ -148,6 +140,14 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
               </ul>
             </div>
           ))}
+          <DragOverlay>
+            {activeTask ? (
+              <div className="p-5 bg-white border border-slate-300 w-[300px] shadow-lg rounded-sm">
+                <p className="text-xl font-bold text-slate-900">{activeTask.name}</p>
+                <p className="text-slate-500 mt-2">{activeTask.description}</p>
+              </div>
+            ) : null}
+          </DragOverlay>
         </DndContext>
 
       </div>
