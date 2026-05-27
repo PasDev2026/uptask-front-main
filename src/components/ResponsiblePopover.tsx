@@ -34,7 +34,10 @@ export default function ResponsiblePopover({ projectId, assignedTo, onAssign, is
     staleTime: 30000,
   })
 
-  const selectedIds = new Set(assignedTo.map((u) => u._id))
+  const validUserIds = new Set(users.map(u => u._id))
+  const selectedIds = new Set(
+    assignedTo.filter(u => validUserIds.has(u._id)).map(u => u._id)
+  )
 
   const toggleUser = (userId: string) => {
     const next = new Set(selectedIds)
