@@ -1,4 +1,4 @@
-import { Fragment } from "react";
+import { Fragment, useEffect } from "react";
 import { Dialog, Transition } from "@headlessui/react";
 import {
   Navigate,
@@ -67,12 +67,17 @@ export default function TaskModalDetails() {
     mutate(data);
   };
 
+  useEffect(() => {
+    if (isError) {
+      Swal.fire({
+        icon: "error",
+        title: error.message,
+        text: "Ocurrió un error, verifique los datos!",
+      });
+    }
+  }, [isError, error]);
+
   if (isError) {
-    Swal.fire({
-      icon: "error",
-      title: error.message,
-      text: "Ocurrió un error, verifique los datos!",
-    });
     return <Navigate to={`/dashboard`} />;
   }
 

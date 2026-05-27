@@ -26,23 +26,18 @@ export async function createTask({formData, projectId, parentTask} : Pick<TaskAP
 }
 
 export async function getTaskById({projectId, taskId}: Pick<TaskAPI, 'projectId' | 'taskId'>) {
-    const token = localStorage.getItem('AUTH_TOKEN') //obtenemos el token
-    console.log(token);
-    try {   
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
         const url = `/dashboard/${projectId}/tasks/${taskId}`
         const {data} = await api(url, {headers: {Authorization: `Bearer ${token}`}})
         const response = taskSchema.safeParse(data)
-        console.log(response);
-        if(response.success){
-            console.log(response.data);
-            
-            return response.data
-        } 
+        if (response.success) return response.data
+        throw new Error('Error al obtener la tarea')
     } catch (error) {
-        if(isAxiosError(error) && error.response){
-            throw new Error('desde onError');
-          }
-        console.log(error);
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data?.error ?? 'Error al obtener la tarea')
+        }
+        throw error
     }
 }
 

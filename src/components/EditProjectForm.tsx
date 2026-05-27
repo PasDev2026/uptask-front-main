@@ -60,7 +60,7 @@ export default function EditProjectForm({
       </h1>
 
       <form
-        className="max-w-sm mx-auto"
+        className="max-w-md mx-auto flex flex-col gap-6"
         onSubmit={handleSubmit(handleForm)}
         noValidate
       >
@@ -68,7 +68,7 @@ export default function EditProjectForm({
 
         <button
           type="submit"
-          className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+          className="w-full bg-brand-primary hover:bg-brand-dark text-white font-medium rounded-lg px-4 py-2.5 transition-colors"
         >
           Guardar cambios
         </button>

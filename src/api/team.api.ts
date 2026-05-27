@@ -1,6 +1,7 @@
 import { isAxiosError } from "axios";
 import api from "../lib/axios";
-import { Project, TeamMember, TeamMemberFormulario, teamMembersSchema, projectMembersResponseSchema, ProjectMembersResponse } from "../types";
+import { z } from "zod";
+import { Project, TeamMember, TeamMemberFormulario, teamMembersSchema, projectMembersResponseSchema, ProjectMembersResponse, SedeUserInfo, sedeUserInfoSchema } from "../types";
 
 export async function findUserByEmail( { projectId, formData } : {projectId : Project['_id'], formData: TeamMemberFormulario}) {
     const token = localStorage.getItem('AUTH_TOKEN') //obtenemos el token
@@ -52,6 +53,23 @@ export async function getProjectMembers(projectId: Project['_id']) {
         if (isAxiosError(error) && error.response) {
             throw new Error('Error al obtener miembros del proyecto')
         }
+    }
+}
+
+export async function getProjectSedeUsers(projectId: Project['_id'], search?: string) {
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
+        const url = `/dashboard/projects/${projectId}/sede-users`
+        const params = search && search.trim() ? { search: search.trim() } : undefined
+        const { data } = await api(url, { headers: { Authorization: `Bearer ${token}` }, params })
+        const response = z.array(sedeUserInfoSchema).safeParse(data)
+        if (response.success) return response.data as SedeUserInfo[]
+        return [] as SedeUserInfo[]
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error('Error al obtener usuarios de la sede')
+        }
+        return [] as SedeUserInfo[]
     }
 }
 

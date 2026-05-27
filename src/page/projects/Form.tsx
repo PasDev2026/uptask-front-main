@@ -1,10 +1,11 @@
 import { FieldErrors, UseFormRegister, UseFormSetValue } from "react-hook-form";
-import ErrorMsg from "../../components/ErrorMsg";
 import { ProjectFormData } from "../../types";
 import { useQuery } from "@tanstack/react-query";
 import { getSedes } from "../../api/empresa.api";
 import { useAuth } from "../../hooks/useAuth";
 import { useEffect } from "react";
+
+const inputCls = "w-full p-2.5 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none";
 
 type Form = {
   register: UseFormRegister<ProjectFormData>;
@@ -30,71 +31,69 @@ export default function Form({ errors, register, setValue, hideEmpresa }: Form) 
   }, [hideEmpresa, sedesFiltradas, setValue]);
 
   return (
-    <>
-      <div className="mb-5 space-y-3">
-        <label htmlFor="projectName" className="text-sm uppercase font-bold">
+    <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="projectName" className="text-sm font-medium text-gray-700">
           Nombre del Proyecto
         </label>
         <input
           id="projectName"
-          className="w-full p-3  border border-gray-200"
+          className={inputCls}
           type="text"
           placeholder="Nombre del Proyecto"
           {...register("projectName", {
             required: "El Titulo del Proyecto es obligatorio",
           })}
         />
-
         {errors.projectName && (
-          <ErrorMsg>{errors.projectName.message}</ErrorMsg>
+          <p className="text-sm text-red-600">{errors.projectName.message}</p>
         )}
       </div>
 
-      <div className="mb-5 space-y-3">
-        <label htmlFor="clientName" className="text-sm uppercase font-bold">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="clientName" className="text-sm font-medium text-gray-700">
           Nombre Cliente
         </label>
         <input
           id="clientName"
-          className="w-full p-3  border border-gray-200"
+          className={inputCls}
           type="text"
           placeholder="Nombre del Cliente"
           {...register("clientName", {
             required: "El Nombre del Cliente es obligatorio",
           })}
         />
-
         {errors.clientName && (
-          <ErrorMsg>{errors.clientName.message}</ErrorMsg>
+          <p className="text-sm text-red-600">{errors.clientName.message}</p>
         )}
       </div>
 
-      <div className="mb-5 space-y-3">
-        <label htmlFor="description" className="text-sm uppercase font-bold">
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="description" className="text-sm font-medium text-gray-700">
           Descripción
         </label>
         <textarea
           id="description"
-          className="w-full p-3  border border-gray-200"
+          className={inputCls}
           placeholder="Descripción del Proyecto"
+          rows={3}
           {...register("description", {
             required: "Una descripción del proyecto es obligatoria",
           })}
         />
-
         {errors.description && (
-          <ErrorMsg>{errors.description.message}</ErrorMsg>
+          <p className="text-sm text-red-600">{errors.description.message}</p>
         )}
       </div>
 
       {!hideEmpresa && sedesFiltradas.length > 1 && (
-        <div className="mb-5 space-y-3">
-          <label htmlFor="empresa" className="text-sm uppercase font-bold">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="empresa" className="text-sm font-medium text-gray-700">
             Sede
           </label>
           <select
             id="empresa"
-            className="w-full p-3 border border-gray-200"
+            className={inputCls}
             {...register("empresa", { required: "La sede es obligatoria" })}
           >
             <option value="">Seleccionar sede</option>
@@ -104,36 +103,36 @@ export default function Form({ errors, register, setValue, hideEmpresa }: Form) 
               </option>
             ))}
           </select>
-
           {errors.empresa && (
-            <ErrorMsg>{errors.empresa.message}</ErrorMsg>
+            <p className="text-sm text-red-600">{errors.empresa.message}</p>
           )}
         </div>
       )}
 
-      <div className="mb-5 space-y-3">
-        <label htmlFor="startDate" className="text-sm uppercase font-bold">
-          Fecha Inicio
-        </label>
-        <input
-          id="startDate"
-          className="w-full p-3 border border-gray-200"
-          type="date"
-          {...register("startDate", { setValueAs: (v) => (v === "" ? null : v) })}
-        />
+      <div className="grid grid-cols-2 gap-4">
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="startDate" className="text-sm font-medium text-gray-700">
+            Fecha Inicio
+          </label>
+          <input
+            id="startDate"
+            className={inputCls}
+            type="date"
+            {...register("startDate", { setValueAs: (v) => (v === "" ? null : v) })}
+          />
+        </div>
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="dueDate" className="text-sm font-medium text-gray-700">
+            Fecha Límite
+          </label>
+          <input
+            id="dueDate"
+            className={inputCls}
+            type="date"
+            {...register("dueDate", { setValueAs: (v) => (v === "" ? null : v) })}
+          />
+        </div>
       </div>
-
-      <div className="mb-5 space-y-3">
-        <label htmlFor="dueDate" className="text-sm uppercase font-bold">
-          Fecha Límite
-        </label>
-        <input
-          id="dueDate"
-          className="w-full p-3 border border-gray-200"
-          type="date"
-          {...register("dueDate", { setValueAs: (v) => (v === "" ? null : v) })}
-        />
-      </div>
-    </>
+    </div>
   );
 }

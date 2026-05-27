@@ -5,9 +5,17 @@ import { userPerfilSchema } from '../auth/validation';
 export const userInfoSchema = z.object({
     _id: z.string(),
     name: z.string(),
-    email: z.string(),
+    email: z.string().optional(),
 })
 export type UserInfo = z.infer<typeof userInfoSchema>
+
+export const sedeUserInfoSchema = z.object({
+    _id: z.string(),
+    name: z.string(),
+    apellido_paterno: z.string(),
+    area: z.object({ _id: z.string(), name: z.string() }).nullish(),
+})
+export type SedeUserInfo = z.infer<typeof sedeUserInfoSchema>
 
 /* Notes */
 export const noteSchema = z.object({
