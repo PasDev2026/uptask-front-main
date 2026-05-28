@@ -10,6 +10,7 @@ import { getProjects } from "../../api/project.api"
 import Spineer from "../../components/Spineer"
 import { useAuth } from "../../hooks/useAuth"
 import DeleteProjectModal from "../../components/DeleteProjectModal"
+import ScrollToTop from "../../components/ScrollToTop"
 import ProjectTableHeader from "../../components/ProjectTableHeader"
 import ProjectTableRow from "../../components/ProjectTableRow"
 import { DashboardProject } from "../../types"
@@ -35,6 +36,8 @@ export default function Dashboard() {
     const [empresaInput, setEmpresaInput] = useState(() => searchParams.get("empresa") || "")
     const [dateFromInput, setDateFromInput] = useState(() => searchParams.get("dateFrom") || "")
     const [dateToInput, setDateToInput] = useState(() => searchParams.get("dateTo") || "")
+
+    const [sort, setSort] = useState<{ field: string; order: string } | null>(null)
 
     const [debouncedFilters, setDebouncedFilters] = useState({
         search: searchInput,
@@ -101,6 +104,13 @@ export default function Dashboard() {
 
     const projects = data?.pages.flatMap(page => page.projects) ?? []
 
+    const sortedProjects = sort
+        ? [...projects].sort((a, b) => {
+            const cmp = a.projectName.localeCompare(b.projectName, 'es', { sensitivity: 'base' })
+            return sort.order === 'desc' ? -cmp : cmp
+        })
+        : projects
+
     const isSearching = searchInput !== debouncedFilters.search
         || empresaInput !== debouncedFilters.empresa
         || dateFromInput !== debouncedFilters.dateFrom
@@ -115,6 +125,16 @@ export default function Dashboard() {
             : dateToInput
                 ? `Hasta ${formatDateShort(dateToInput)}`
                 : "Filtrar por fechas"
+
+    const handleSort = (field: string) => {
+        setSort(prev => {
+            if (prev?.field === field) {
+                if (prev.order === 'asc') return { field, order: 'desc' }
+                return null
+            }
+            return { field, order: 'asc' }
+        })
+    }
 
     const clearAllFilters = () => {
         setSearchInput("")
@@ -230,10 +250,14 @@ export default function Dashboard() {
                     )}
                 </div>
 
-                {projects.length ? (
+                {sortedProjects.length ? (
                     <div className="border border-slate-100 mt-6 bg-white">
-                        <ProjectTableHeader />
-                        {projects.map((project: DashboardProject) => (
+                        <ProjectTableHeader
+                            sortBy={sort?.field}
+                            sortOrder={sort?.order}
+                            onSort={handleSort}
+                        />
+                        {sortedProjects.map((project: DashboardProject) => (
                             <ProjectTableRow key={project._id} project={project} user={user} />
                         ))}
                         {hasNextPage && (
@@ -267,6 +291,7 @@ export default function Dashboard() {
                     </p>
                 )}
                 <DeleteProjectModal />
+                <ScrollToTop />
             </div>
         )
 }

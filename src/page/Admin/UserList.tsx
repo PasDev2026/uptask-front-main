@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
-import { KeyIcon, PencilIcon } from "@heroicons/react/20/solid"
+import { KeyIcon, PencilIcon, ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/20/solid"
 import { getAllUsers, updateUserStatus } from "../../api/admin.api";
 import Spineer from "../../components/Spineer";
 import UserStatusModal from "../../components/UserStatusModal";
@@ -156,12 +156,23 @@ export default function UserList() {
                       {user.estado ? 'Activo' : 'Inactivo'}
                     </button>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="text-sm text-gray-500">
-                      {user.empresas && user.empresas.length > 0
-                        ? user.empresas.map(e => e.nombre).join(', ')
-                        : 'Sin asignar'}
-                    </span>
+                  <td className="px-6 py-4">
+                    {user.empresas && user.empresas.length > 0 ? (
+                      <div className="flex flex-wrap gap-1">
+                        {user.empresas.slice(0, 2).map(e => (
+                          <span key={e._id} className="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 font-medium whitespace-nowrap">
+                            {e.nombre}
+                          </span>
+                        ))}
+                        {user.empresas.length > 2 && (
+                          <span className="px-2 py-0.5 text-xs rounded-full bg-slate-200 text-slate-500 font-semibold whitespace-nowrap">
+                            +{user.empresas.length - 2}
+                          </span>
+                        )}
+                      </div>
+                    ) : (
+                      <span className="text-sm text-gray-500">Sin asignar</span>
+                    )}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex gap-2">
@@ -191,20 +202,54 @@ export default function UserList() {
             <p className="text-sm text-gray-500">
               Mostrando {offset + 1}–{Math.min(page * PAGE_SIZE, data.total)} de {data.total} usuarios
             </p>
-            <div className="flex gap-2">
+            <div className="flex items-center gap-1">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                aria-label="Página anterior"
               >
-                ← Anterior
+                <ChevronLeftIcon className="h-5 w-5" />
               </button>
+              {Array.from({ length: Math.ceil(data.total / PAGE_SIZE) }, (_, i) => i + 1)
+                .reduce<(number | '...')[]>((pages, p, _i, all) => {
+                  const first = p === 1
+                  const last = p === all.length
+                  const near = Math.abs(p - page) <= 1
+                  const prevIsEllipsis = pages[pages.length - 1] === '...'
+                  if (first || last || near) {
+                    pages.push(p)
+                  } else if (!prevIsEllipsis) {
+                    pages.push('...')
+                  }
+                  return pages
+                }, [])
+                .map((item, i) =>
+                  item === '...' ? (
+                    <span key={`ellipsis-${i}`} className="px-2 text-sm text-gray-400 select-none">
+                      ...
+                    </span>
+                  ) : (
+                    <button
+                      key={item}
+                      onClick={() => setPage(item)}
+                      className={`min-w-[32px] h-8 text-sm font-medium rounded-md transition-colors ${
+                        item === page
+                          ? 'bg-brand-primary text-white shadow-sm'
+                          : 'text-gray-600 hover:bg-gray-100'
+                      }`}
+                    >
+                      {item}
+                    </button>
+                  )
+                )}
               <button
                 disabled={page * PAGE_SIZE >= data.total}
                 onClick={() => setPage((p) => p + 1)}
-                className="px-3 py-1.5 text-sm font-medium text-gray-700 bg-white border border-gray-300 rounded-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                aria-label="Página siguiente"
               >
-                Siguiente →
+                <ChevronRightIcon className="h-5 w-5" />
               </button>
             </div>
           </div>

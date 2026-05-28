@@ -11,6 +11,7 @@ module.exports = {
     extend: {
       fontFamily: {
         sans: ['Nunito', ...defaultTheme.fontFamily.sans],
+        serif: ['Playfair Display', ...defaultTheme.fontFamily.serif],
       },
       colors: {
         brand: {
