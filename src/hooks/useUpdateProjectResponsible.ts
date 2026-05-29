@@ -15,6 +15,7 @@ export const useUpdateProjectResponsible = () => {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["projects"] })
             queryClient.invalidateQueries({ queryKey: ["editProject", variables.projectId] })
+            queryClient.invalidateQueries({ queryKey: ["projectSedeUsers", variables.projectId] })
         },
     })
 }

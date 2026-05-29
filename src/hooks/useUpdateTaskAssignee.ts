@@ -16,6 +16,7 @@ export const useUpdateTaskAssignee = () => {
         onSuccess: (_data, variables) => {
             queryClient.invalidateQueries({ queryKey: ["projectTasks", variables.projectId] })
             queryClient.invalidateQueries({ queryKey: ["subtasks"] })
+            queryClient.invalidateQueries({ queryKey: ["projectSedeUsers", variables.projectId] })
         },
     })
 }

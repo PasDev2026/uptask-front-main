@@ -59,6 +59,7 @@ export const taskSchema = z.object({
     parentTask: z.string().nullable(),
     ancestors: z.array(z.string()),
     order: z.number(),
+    subtaskCount: z.number().default(0),
     createdAt: z.string(),
     updatedAt: z.string()
 })
@@ -72,6 +73,7 @@ export const taskProjectSchema = taskSchema.pick({
     dueDate: true,
     parentTask: true,
     order: true,
+    subtaskCount: true,
 }).extend({
     assignedTo: z.array(userInfoSchema).default([]),
 })
@@ -98,7 +100,6 @@ export type TaskProject = z.infer<typeof taskProjectSchema>
 export const projectSchema = z.object({
     _id: z.string(),
     projectName: z.string(),
-    clientName: z.string(),
     description: z.string().default(''),
     manager: z.string(),
     empresa: z.string(),
@@ -120,7 +121,6 @@ export const dashboardProjectsSchema = z.object({
     projects: z.array(
         z.object({
             _id: z.string(),
-            clientName: z.string(),
             projectName: z.string(),
             description: z.string().default(''),
             manager: z.string(),
@@ -143,7 +143,6 @@ export type ProjectsResponse = z.infer<typeof dashboardProjectsSchema>
 
 export const editProjectSchema = projectSchema.pick({
     projectName: true,
-    clientName: true,
     description: true,
 }).extend({
     empresa: z.string(),
@@ -167,7 +166,7 @@ export const fullProjectDetailsSchema = projectSchema.extend({
 })
 export type FullProjectDetails = z.infer<typeof fullProjectDetailsSchema>
 
-export type ProjectFormData = Pick<Project, 'clientName' | 'projectName' | 'description'> & { empresa: string, startDate?: string | null, dueDate?: string | null }
+export type ProjectFormData = Pick<Project, 'projectName' | 'description'> & { empresa: string, startDate?: string | null, dueDate?: string | null }
 
 /* TEAM */
 export const teamMemberSchema = userPerfilSchema.pick({

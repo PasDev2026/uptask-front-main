@@ -50,7 +50,9 @@ export async function authenticate(formData:UserLoginForm) {
         return data
     } catch (error) {
         if(isAxiosError(error) && error.response){
-            throw new Error(error.response.data.message);
+            const err = new Error(error.response.data.error);
+            (err as any).field = error.response.data.field || 'general';
+            throw err;
         }
         throw new Error('Error de conexión con el servidor');
     }

@@ -80,7 +80,7 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
   return (
     <div>
       <div
-        className="grid items-center px-4 py-2 hover:bg-slate-50 transition-colors border-b border-slate-50 divide-x divide-slate-100"
+        className="grid items-center px-4 py-2 hover:bg-slate-50 transition-colors border-b border-slate-50 divide-x divide-slate-100 group"
         style={{ gridTemplateColumns: TABLE_GRID }}
       >
         <div
@@ -89,7 +89,13 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
         >
           <button
             onClick={(e) => { e.stopPropagation(); setExpanded(!expanded) }}
-            className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+            className={`p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200 transition-all flex-shrink-0 ${
+              subtask.subtaskCount > 0
+                ? 'opacity-100'
+                : expanded
+                  ? 'opacity-100'
+                  : 'opacity-0 group-hover:opacity-100'
+            }`}
           >
             {isLoading ? (
               <span className="h-3.5 w-3.5 block animate-pulse bg-gray-200 rounded" />

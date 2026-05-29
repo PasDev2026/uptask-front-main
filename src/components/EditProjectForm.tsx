@@ -18,7 +18,7 @@ export default function EditProjectForm({
 
     const navigate = useNavigate()
   //rellenando automaticamente el formulario
-  const { projectName, clientName, description, empresa, startDate, dueDate } = data;
+  const { projectName, description, empresa, startDate, dueDate } = data;
   const startDateValue = startDate ? startDate.split('T')[0] : undefined;
   const dueDateValue = dueDate ? dueDate.split('T')[0] : undefined;
 
@@ -26,7 +26,7 @@ export default function EditProjectForm({
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<ProjectFormData>({ defaultValues: { projectName, clientName, description, empresa, startDate: startDateValue, dueDate: dueDateValue } });
+  } = useForm<ProjectFormData>({ defaultValues: { projectName, description, empresa, startDate: startDateValue, dueDate: dueDateValue } });
 
 
   const queryClient = useQueryClient();

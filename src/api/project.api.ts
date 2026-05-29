@@ -103,10 +103,10 @@ export async function deleteProject(id: Project['_id']){
     }
 }
 
-export async function getProjectTasksPreview(projectId: Project['_id']) {
+export async function getProjectTasks(projectId: Project['_id']) {
     const token = localStorage.getItem('AUTH_TOKEN')
     try {
-        const { data } = await api(`/dashboard/projects/${projectId}/tasks-preview`, {
+        const { data } = await api(`/dashboard/projects/${projectId}/tasks`, {
             headers: { Authorization: `Bearer ${token}` }
         })
         const response = taskPreviewResponseSchema.safeParse(data)

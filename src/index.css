@@ -1,3 +1,52 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+@layer base {
+  :root {
+    --input-bg: #F0F4F8;
+    --input-border: transparent;
+    --input-border-focus: #2DAAA5;
+    --input-icon: #94A3B8;
+    --input-icon-focus: #2DAAA5;
+    --label-color: #00375A;
+    --text-primary: #1E293B;
+    --text-secondary: #64748B;
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F8FAFC;
+    --brand-primary: #2DAAA5;
+    --brand-hover: #248f8a;
+  }
+
+  .group:focus-within .group-icon {
+    color: var(--input-icon-focus) !important;
+  }
+
+  input:-webkit-autofill,
+  input:-webkit-autofill:hover,
+  input:-webkit-autofill:focus,
+  input:-webkit-autofill:active {
+    -webkit-box-shadow: 0 0 0 1000px var(--input-bg) inset !important;
+    -webkit-text-fill-color: var(--text-primary) !important;
+    caret-color: var(--text-primary) !important;
+    background-color: transparent !important;
+    border: none !important;
+    outline: none !important;
+    transition: background-color 50000s ease-in-out 0s;
+  }
+
+  [data-theme="dark"] {
+    --input-bg: #1E293B;
+    --input-border: transparent;
+    --input-border-focus: #4BC3BE;
+    --input-icon: #64748B;
+    --input-icon-focus: #4BC3BE;
+    --label-color: #E2E8F0;
+    --text-primary: #F1F5F9;
+    --text-secondary: #94A3B8;
+    --bg-primary: #0F172A;
+    --bg-secondary: #1E293B;
+    --brand-primary: #4BC3BE;
+    --brand-hover: #3DAFAA;
+  }
+}

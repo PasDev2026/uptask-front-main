@@ -13,7 +13,6 @@ export default function ProjectPage() {
 
   const initialValues: ProjectFormData = {
     projectName: "",
-    clientName: "",
     description: "",
     empresa: "",
     dueDate: undefined,

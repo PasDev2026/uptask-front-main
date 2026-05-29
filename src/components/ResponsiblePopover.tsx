@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react"
 import { useQuery } from "@tanstack/react-query"
 import { getProjectSedeUsers } from "../api/team.api"
@@ -27,11 +27,18 @@ type ResponsiblePopoverProps = {
 
 export default function ResponsiblePopover({ projectId, assignedTo, onAssign, isPending = false }: ResponsiblePopoverProps) {
   const [search, setSearch] = useState("")
+  const [debouncedSearch, setDebouncedSearch] = useState("")
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedSearch(search), 300)
+    return () => clearTimeout(timer)
+  }, [search])
 
   const { data: users = [] } = useQuery({
-    queryKey: ["projectSedeUsers", projectId, search],
-    queryFn: () => getProjectSedeUsers(projectId, search || undefined),
-    staleTime: 30000,
+    queryKey: ["projectSedeUsers", projectId, debouncedSearch],
+    queryFn: () => getProjectSedeUsers(projectId, debouncedSearch || undefined),
+    staleTime: 5 * 60 * 1000,
+    refetchOnWindowFocus: false,
   })
 
   const validUserIds = new Set(users.map(u => u._id))

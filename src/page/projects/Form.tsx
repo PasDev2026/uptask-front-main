@@ -51,24 +51,6 @@ export default function Form({ errors, register, setValue, hideEmpresa }: Form) 
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="clientName" className="text-sm font-medium text-gray-700">
-          Nombre Cliente
-        </label>
-        <input
-          id="clientName"
-          className={inputCls}
-          type="text"
-          placeholder="Nombre del Cliente"
-          {...register("clientName", {
-            required: "El Nombre del Cliente es obligatorio",
-          })}
-        />
-        {errors.clientName && (
-          <p className="text-sm text-red-600">{errors.clientName.message}</p>
-        )}
-      </div>
-
-      <div className="flex flex-col gap-1.5">
         <label htmlFor="description" className="text-sm font-medium text-gray-700">
           Descripción
         </label>

@@ -1,7 +1,7 @@
 import { useState } from "react"
 import { Link } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
-import { getProjectTasksPreview } from "../../api/project.api"
+import { getProjectTasks } from "../../api/project.api"
 import { createTask } from "../../api/task.api"
 import { TaskPreviewResponse } from "../../types"
 import TaskTableSubtasks from "./TaskTableSubtasks"
@@ -34,7 +34,7 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
   const { data, isLoading, isError } = useQuery<TaskPreviewResponse>({
     queryKey: ["projectTasks", projectId],
     queryFn: async () => {
-      const result = await getProjectTasksPreview(projectId)
+      const result = await getProjectTasks(projectId)
       if (!result) throw new Error("No data")
       return result
     },
@@ -169,7 +169,7 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
         <div key={task._id} className="border-b border-slate-50 last:border-b-0">
           <div
             //SIN cursor-pointer
-            className="grid items-center px-4 py-2.5 hover:bg-slate-50 transition-colors divide-x divide-slate-100"
+            className="grid items-center px-4 py-2.5 hover:bg-slate-50 transition-colors divide-x divide-slate-100 group"
             style={{ gridTemplateColumns: TABLE_GRID }}
             //onClick={() => navigate(`/projects/${projectId}/details-projects?viewTask=${task._id}`)}
           >
@@ -183,7 +183,13 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
                   e.stopPropagation()
                   toggleExpand(task._id)
                 }}
-                className="p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200 transition-colors flex-shrink-0"
+                className={`p-1 text-gray-400 hover:text-gray-600 rounded hover:bg-gray-200 transition-all flex-shrink-0 ${
+                  task.subtaskCount > 0
+                    ? 'opacity-100'
+                    : expandedTasks.has(task._id)
+                      ? 'opacity-100'
+                      : 'opacity-0 group-hover:opacity-100'
+                }`}
               >
                 {expandedTasks.has(task._id) ? (
                   <ChevronDownIcon className="h-3.5 w-3.5" />

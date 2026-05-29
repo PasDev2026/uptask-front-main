@@ -6,12 +6,32 @@ import { authenticate } from "../../api/auth.api";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/20/solid";
 import { useMutation } from "@tanstack/react-query";
 import Swal from "sweetalert2";
+import InputField from "../../components/ui/InputField";
 
+interface ApiErrors {
+  username?: string;
+  password?: string;
+  general?: string;
+}
 
+const UserIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <circle cx="12" cy="8" r="4" />
+    <path d="M4 21c0-4 3.6-7 8-7s8 3 8 7" />
+  </svg>
+)
+
+const LockIcon = () => (
+  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+    <rect x="5" y="11" width="14" height="10" rx="2" />
+    <path d="M8 11V7a4 4 0 1 1 8 0v4" />
+  </svg>
+)
 
 export default function Login() {
 
   const [showPassword, setShowPassword] = useState(false)
+  const [apiErrors, setApiErrors] = useState<ApiErrors>({})
   const initialValues: UserLoginForm = {username: '',password: ''}
   const { register, handleSubmit, formState: { errors } } = useForm({ defaultValues: initialValues })
   const navigate = useNavigate()
@@ -23,108 +43,92 @@ export default function Login() {
         icon: 'info',
         title: 'Cuenta desactivada',
         text: 'Tu cuenta ha sido desactivada por un administrador. No puedes continuar en el sistema.',
-        confirmButtonColor: '#2DAAA5'
+        confirmButtonColor: 'var(--brand-primary)'
       })
     }
   }, [])
   
   const {mutate} = useMutation({
     mutationFn: authenticate,
-    onError: (error) => {
-      Swal.fire({
-        icon: "error",
-        title: error.message,
-        text: "Hubo un error, verifique los datos! O la cuenta no ha sido confirmada",
-      });
+    onError: (error: any) => {
+      if (error.field) {
+        setApiErrors(prev => ({ ...prev, [error.field]: error.message }));
+      } else {
+        setApiErrors(prev => ({ ...prev, general: error.message }));
+      }
     },
     onSuccess: () => {
       navigate('/dashboard')
     },
   })
 
-  const handleLogin = (formData: UserLoginForm) => { 
+  const handleLogin = (formData: UserLoginForm) => {
+    setApiErrors({})
     mutate(formData)
-  }  
+  }
+
+  const clearFieldError = (field: keyof ApiErrors) => {
+    setApiErrors(prev => ({ ...prev, [field]: undefined }));
+  }
+
   return (
     <>
-        <h2 className="text-3xl font-bold text-gray-800 text-center">
-          Inicia Sesión
-        </h2>
+      <h2 className="text-2xl font-bold text-center mb-8" style={{ color: 'var(--text-primary)' }}>
+        Inicia Sesión
+      </h2>
+
       <form
         onSubmit={handleSubmit(handleLogin)}
-        className="space-y-8 p-10 bg-white"
+        className="flex flex-col gap-6"
         noValidate
       >
-        <div className="flex flex-col gap-5">
-          <label
-            className="font-normal text-2xl"
-          >Usuario</label>
+        <InputField
+          id="username"
+          label="Usuario"
+          type="text"
+          placeholder="Ingresa tu usuario"
+          icon={<UserIcon />}
+          error={errors.username?.message || apiErrors.username}
+          {...register("username", {
+            required: "El nombre de usuario es obligatorio",
+            onChange: () => clearFieldError('username'),
+          })}
+        />
 
-          <input
-            id="username"
-            type="text"
-            placeholder="Ingresa tu usuario"
-            className="w-full p-3  border-gray-300 border"
-            {...register("username", {
-              required: "El nombre de usuario es obligatorio",
-            })}
-          />
-          {errors.username && (
-            <p>{errors.username.message}</p>
-          )}
-        </div>
-
-        <div className="flex flex-col gap-5">
-          <label
-            className="font-normal text-2xl"
-          >Contraseña</label>
-
-          <div className="relative">
-            <input
-              type={showPassword ? "text" : "password"}
-              placeholder="Ingresa tu contraseña"
-              className="w-full p-3 pr-10 border-gray-300 border"
-              {...register("password", {
-                required: "El Password es obligatorio",
-              })}
-            />
+        <InputField
+          id="password"
+          label="Contraseña"
+          type={showPassword ? "text" : "password"}
+          placeholder="Ingresa tu contraseña"
+          icon={<LockIcon />}
+          error={errors.password?.message || apiErrors.password}
+          suffix={
             <button
               type="button"
               onClick={() => setShowPassword(!showPassword)}
-              className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              className="text-gray-400 hover:text-gray-600 transition-colors"
             >
-              {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
+              {showPassword ? <EyeSlashIcon className="h-4 w-4" /> : <EyeIcon className="h-4 w-4" />}
             </button>
-          </div>
-          {errors.password && (
-            <p>{errors.password.message}</p>
-          )}
-        </div>
-
-        <input
-          type="submit"
-          value='Iniciar Sesión'
-          className="w-full p-3 text-white font-bold text-xl cursor-pointer rounded-full transition-colors duration-300"
-          style={{
-            backgroundColor: '#2DAAA5',
-          }}
-          onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#248f8a'}
-          onMouseOut={(e) => e.currentTarget.style.backgroundColor = '#2DAAA5'}
+          }
+          {...register("password", {
+            required: "El Password es obligatorio",
+            onChange: () => clearFieldError('password'),
+          })}
         />
-      </form>
 
-     {/*  <p className="text-gray-500 text-sm text-center mt-8">
-        ¿No tienes una cuenta?{" "}
-        <Link to={"/auth/register"} className="text-blue-600 hover:underline">
-          Regístrate aquí
-        </Link>
-      </p>
-      <p className="text-gray-500 text-sm text-center mt-8">
-        ¿Olvidaste tu contraseña? 
-        <Link to={"/auth/change-password"} className="text-blue-600 hover:underline">
-          Reestablecer
-        </Link>
-      </p> */}
+        {apiErrors.general && (
+          <p className="text-xs font-medium text-center text-red-500">{apiErrors.general}</p>
+        )}
+
+        <button
+          type="submit"
+          className="w-full py-3 px-4 rounded-xl text-white font-semibold text-sm transition-all duration-200 hover:brightness-90 active:scale-[0.98]"
+          style={{ backgroundColor: 'var(--brand-primary)' }}
+        >
+          Iniciar Sesión
+        </button>
+      </form>
     </>
   )
 }
