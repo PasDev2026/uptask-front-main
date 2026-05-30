@@ -8,6 +8,7 @@ import { deleteTaskApi } from "../api/task.api";
 import Swal from "sweetalert2";
 import { useDraggable } from '@dnd-kit/core'
 import PriorityBadge from "./PriorityBadge";
+import { statusColors } from "../traductor/es";
 
 type TaskCardProps = {
   task: TaskProject;
@@ -43,8 +44,12 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
   })
 
 
+  const cardColors = statusColors[task.status]
+  const cardBorder = cardColors?.cardBorder ?? "border-l-transparent"
+  const cardBg = cardColors?.cardBg ?? "bg-white"
+
   return (
-    <li className="p-5 bg-white border border-slate-300 flex justify-between">
+    <li className={`group p-5 ${cardBg} rounded-lg shadow-sm border border-slate-100 border-l-4 flex justify-between ${cardBorder}`}>
       <div 
         {...listeners}
         {...attributes}
@@ -61,10 +66,10 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
           </p>
           <PriorityBadge priority={task.priority} />
         </div>
-        <p className="text-slate-500">{task.description}</p>
+        <p className="text-slate-500 text-sm">{task.description}</p>
       </div>
-      <div className="flex shrink-0  gap-x-6">
-        <Menu as="div" className="relative flex-none">
+      <div className="flex shrink-0 gap-x-6">
+        <Menu as="div" className="relative flex-none opacity-0 group-hover:opacity-100 transition-opacity">
           <Menu.Button className="-m-2.5 block p-2.5 text-gray-500 hover:text-gray-900">
             <span className="sr-only">opciones</span>
             <EllipsisVerticalIcon className="h-9 w-9" aria-hidden="true" />

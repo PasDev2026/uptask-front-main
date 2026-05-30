@@ -43,6 +43,9 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
     },
   });
 
+  // Watch empresas selectively to feed custom SedeInputTag (does not trigger full-modal lags)
+  const empresasSelected = watch("empresas") || [];
+
   // Reset form when user data arrives
   useEffect(() => {
     if (user && isOpen) {
@@ -96,16 +99,6 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
     },
   });
 
-  const handlePhoneInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 9);
-    setValue("telefono", value, { shouldValidate: true });
-  };
-
-  const handleDniInput = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value.replace(/\D/g, "").slice(0, 8);
-    setValue("dni", value, { shouldValidate: true });
-  };
-
   const handleEdit = (formData: UserEditForm) => {
     if (user) {
       const { department, dni, empresas, area, ...rest } = formData;
@@ -138,7 +131,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
 
   return (
     <Transition appear show={isOpen} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -162,7 +155,7 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
+              <Dialog.Panel className="w-full max-w-2xl transform overflow-hidden rounded-2xl bg-white p-7 text-left align-middle shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-slate-100/60 transition-all">
                 {isLoading && (
                   <div className="flex justify-center py-16">
                     <Spineer />
@@ -170,225 +163,234 @@ export default function UserEditModal({ isOpen, onClose, userId }: UserEditModal
                 )}
 
                 {isError && (
-                  <>
-                    <Dialog.Title as="h3" className="text-2xl font-black mb-4 text-red-600">
-                      Error
+                  <div className="text-center py-8">
+                    <Dialog.Title as="h3" className="text-lg font-bold mb-2 text-red-500">
+                      Error al cargar información
                     </Dialog.Title>
-                    <p className="text-gray-600">{error?.message || "Error al cargar el usuario"}</p>
+                    <p className="text-sm text-slate-500">{error?.message || "Error al cargar el usuario"}</p>
                     <button
                       onClick={onClose}
-                      className="mt-4 px-4 py-2 bg-gray-200 rounded-lg hover:bg-gray-300"
+                      className="mt-6 px-4 py-2 border border-slate-200 rounded-lg text-sm font-semibold text-slate-600 hover:bg-slate-50 cursor-pointer"
                     >
                       Cerrar
                     </button>
-                  </>
+                  </div>
                 )}
 
                 {user && (
                   <>
-                    <Dialog.Title as="h3" className="text-2xl font-black mb-6">
+                    <Dialog.Title as="h3" className="text-xl font-extrabold tracking-tight text-slate-800 mb-6">
                       Editar usuario
                     </Dialog.Title>
 
-                    <form onSubmit={handleSubmit(handleEdit)} noValidate>
-                      <div className="max-h-[65vh] overflow-y-auto -mr-2 pr-2">
-                        <div className="grid grid-cols-2 gap-x-6">
+                    <form onSubmit={handleSubmit(handleEdit)} noValidate className="space-y-5">
+                      <div className="max-h-[60vh] overflow-y-auto pr-1 -mr-1 scrollbar-thin">
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                           <div className="space-y-4">
                             {/* Nombre */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-name" className="font-medium text-gray-700">
+                              <label htmlFor="edit-name" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Nombre
                               </label>
                               <input
                                 id="edit-name"
                                 type="text"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                                 {...register("name", { required: "El nombre es obligatorio" })}
                               />
-                              {errors.name && <p className="text-sm text-red-600">{errors.name.message}</p>}
+                              {errors.name && <p className="text-xs text-red-500 font-semibold mt-1">{errors.name.message}</p>}
                             </div>
 
                             {/* Apellido Paterno */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-apellido_paterno" className="font-medium text-gray-700">
+                              <label htmlFor="edit-apellido_paterno" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Apellido paterno
                               </label>
                               <input
                                 id="edit-apellido_paterno"
                                 type="text"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                                 {...register("apellido_paterno", { required: "El apellido paterno es obligatorio" })}
                               />
-                              {errors.apellido_paterno && <p className="text-sm text-red-600">{errors.apellido_paterno.message}</p>}
+                              {errors.apellido_paterno && <p className="text-xs text-red-500 font-semibold mt-1">{errors.apellido_paterno.message}</p>}
                             </div>
 
                             {/* Apellido Materno */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-apellido_materno" className="font-medium text-gray-700">
+                              <label htmlFor="edit-apellido_materno" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Apellido materno
                               </label>
                               <input
                                 id="edit-apellido_materno"
                                 type="text"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                                 {...register("apellido_materno", { required: "El apellido materno es obligatorio" })}
                               />
-                              {errors.apellido_materno && <p className="text-sm text-red-600">{errors.apellido_materno.message}</p>}
+                              {errors.apellido_materno && <p className="text-xs text-red-500 font-semibold mt-1">{errors.apellido_materno.message}</p>}
                             </div>
 
                             {/* DNI */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-dni" className="font-medium text-gray-700">
+                              <label htmlFor="edit-dni" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 DNI (opcional)
                               </label>
                               <input
                                 id="edit-dni"
                                 type="text"
-                                placeholder="Documento Nacional de Identidad (máximo 8 dígitos)"
-                                className={`w-full p-2 border rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none ${
-                                  dniError ? "border-red-500" : "border-gray-300"
+                                placeholder="Máximo 8 dígitos"
+                                className={`w-full px-3 py-2 border rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150 ${
+                                  dniError || errors.dni ? "border-red-400 focus:ring-red-100 focus:border-red-400" : "border-slate-200"
                                 }`}
-                                value={watch("dni") || ""}
-                                onChange={handleDniInput}
+                                {...register("dni", {
+                                  onChange: (e) => {
+                                    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 8);
+                                  }
+                                })}
                               />
-                              {errors.dni && <p className="text-sm text-red-600">{errors.dni.message}</p>}
-                              {dniError && <p className="text-sm text-red-600">{dniError}</p>}
+                              {errors.dni && <p className="text-xs text-red-500 font-semibold mt-1">{errors.dni.message}</p>}
+                              {dniError && <p className="text-xs text-red-500 font-semibold mt-1">{dniError}</p>}
                             </div>
 
                             {/* Teléfono */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-telefono" className="font-medium text-gray-700">
+                              <label htmlFor="edit-telefono" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Teléfono
                               </label>
                               <input
                                 id="edit-telefono"
                                 type="tel"
-                                placeholder="Máximo 9 dígitos"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
-                                value={watch("telefono") || ""}
-                                onChange={handlePhoneInput}
+                                placeholder="9 dígitos"
+                                className={`w-full px-3 py-2 border rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150 ${
+                                  errors.telefono ? "border-red-400 focus:ring-red-100 focus:border-red-400" : "border-slate-200"
+                                }`}
+                                {...register("telefono", {
+                                  onChange: (e) => {
+                                    e.target.value = e.target.value.replace(/\D/g, "").slice(0, 9);
+                                  }
+                                })}
                               />
-                              {errors.telefono && <p className="text-sm text-red-600">{errors.telefono.message}</p>}
+                              {errors.telefono && <p className="text-xs text-red-500 font-semibold mt-1">{errors.telefono.message}</p>}
                             </div>
                           </div>
 
                           <div className="space-y-4">
                             {/* Email */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-email" className="font-medium text-gray-700">
+                              <label htmlFor="edit-email" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Email
                               </label>
                               <input
                                 id="edit-email"
                                 type="email"
-                                className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
+                                className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                                 {...register("email", {
                                   required: "El email es obligatorio",
                                   pattern: { value: /\S+@\S+\.\S+/, message: "E-mail no válido" },
                                 })}
                               />
-                              {errors.email && <p className="text-sm text-red-600">{errors.email.message}</p>}
+                              {errors.email && <p className="text-xs text-red-500 font-semibold mt-1">{errors.email.message}</p>}
                             </div>
 
                             {/* Username */}
                             <div className="flex flex-col gap-1">
-                              <label htmlFor="edit-username" className="font-medium text-gray-700">
+                              <label htmlFor="edit-username" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
                                 Username
                               </label>
                               <input
                                 id="edit-username"
                                 type="text"
                                 disabled
-                                className="w-full p-2 border border-gray-300 rounded-md bg-gray-100 text-gray-500 cursor-not-allowed"
+                                className="w-full px-3 py-2 border border-slate-100 rounded-lg text-sm bg-slate-50 text-slate-400 select-none cursor-not-allowed"
                                 {...register("username")}
                               />
                             </div>
 
-                             {/* Departamento */}
-                             <div className="flex flex-col gap-1">
-                               <label htmlFor="edit-department" className="font-medium text-gray-700">
-                                 Departamento
-                               </label>
-                               {rolesLoading ? (
-                                 <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
-                                   Cargando roles...
-                                 </div>
-                               ) : rolesError ? (
-                                 <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 text-red-600 text-sm">
-                                   Error al cargar los roles
-                                 </div>
-                               ) : (
-                                 <select
-                                   id="edit-department"
-                                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
-                                   {...register("department", { required: "El departamento es obligatorio" })}
-                                 >
-                                   <option value="">-- Selecciona --</option>
-                                   {roles?.map((role: Role) => (
-                                     <option key={role._id} value={role._id}>
-                                       {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
-                                     </option>
-                                   ))}
-                                 </select>
-                               )}
-                               {errors.department && <p className="text-sm text-red-600">{errors.department.message}</p>}
-                             </div>
+                            {/* Departamento */}
+                            <div className="flex flex-col gap-1">
+                              <label htmlFor="edit-department" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
+                                Departamento
+                              </label>
+                              {rolesLoading ? (
+                                <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-400 select-none">
+                                  Cargando roles...
+                                </div>
+                              ) : rolesError ? (
+                                <div className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm bg-red-50 text-red-600">
+                                  Error al cargar los roles
+                                </div>
+                              ) : (
+                                <select
+                                  id="edit-department"
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
+                                  {...register("department", { required: "El departamento es obligatorio" })}
+                                >
+                                  <option value="">-- Selecciona --</option>
+                                  {roles?.map((role: Role) => (
+                                    <option key={role._id} value={role._id}>
+                                      {role.name.charAt(0).toUpperCase() + role.name.slice(1)}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                              {errors.department && <p className="text-xs text-red-500 font-semibold mt-1">{errors.department.message}</p>}
+                            </div>
 
-                             {/* Área */}
-                             <div className="flex flex-col gap-1">
-                               <label htmlFor="edit-area" className="font-medium text-gray-700">
-                                 Área
-                               </label>
-                               {areasLoading ? (
-                                 <div className="w-full p-2 border border-gray-300 rounded-md bg-gray-50 text-gray-500">
-                                   Cargando áreas...
-                                 </div>
-                               ) : areasError ? (
-                                 <div className="w-full p-2 border border-red-300 rounded-md bg-red-50 text-red-600 text-sm">
-                                   Error al cargar las áreas
-                                 </div>
-                               ) : (
-                                 <select
-                                   id="edit-area"
-                                   className="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-brand-primary focus:outline-none"
-                                   {...register("area")}
-                                 >
-                                   <option value="">-- Selecciona --</option>
-                                   {areas?.map((area: Area) => (
-                                     <option key={area._id} value={area._id}>
-                                       {area.name.charAt(0).toUpperCase() + area.name.slice(1)}
-                                     </option>
-                                   ))}
-                                 </select>
-                               )}
-                             </div>
-                             {/* Sedes */}
-                           <div className="flex flex-col gap-1">
-                             <label className="font-medium text-gray-700">
-                               Sedes
-                             </label>
-                             <SedeInputTag
-                               value={watch("empresas") || []}
-                               onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
-                               error={errors.empresas?.message}
-                             />
-                           </div>
+                            {/* Área */}
+                            <div className="flex flex-col gap-1">
+                              <label htmlFor="edit-area" className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
+                                Área
+                              </label>
+                              {areasLoading ? (
+                                <div className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-400 select-none">
+                                  Cargando áreas...
+                                </div>
+                              ) : areasError ? (
+                                <div className="w-full px-3 py-2 border border-red-200 rounded-lg text-sm bg-red-50 text-red-600">
+                                  Error al cargar las áreas
+                                </div>
+                              ) : (
+                                <select
+                                  id="edit-area"
+                                  className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
+                                  {...register("area")}
+                                >
+                                  <option value="">-- Selecciona --</option>
+                                  {areas?.map((area: Area) => (
+                                    <option key={area._id} value={area._id}>
+                                      {area.name.charAt(0).toUpperCase() + area.name.slice(1)}
+                                    </option>
+                                  ))}
+                                </select>
+                              )}
+                            </div>
+
+                            {/* Sedes */}
+                            <div className="flex flex-col gap-1">
+                              <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
+                                Sedes
+                              </label>
+                              <SedeInputTag
+                                value={empresasSelected}
+                                onChange={(ids) => setValue("empresas", ids, { shouldValidate: true })}
+                                error={errors.empresas?.message}
+                              />
+                            </div>
                           </div>
                         </div>
                       </div>
 
                       {/* Botones */}
-                      <div className="mt-6 flex gap-3">
+                      <div className="mt-8 flex gap-3">
                         <button
                           type="button"
                           onClick={onClose}
-                          className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors"
+                          className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg text-slate-500 text-sm font-bold hover:bg-slate-50 active:scale-[0.98] transition-all duration-150 cursor-pointer"
                         >
                           Cancelar
                         </button>
                         <button
                           type="submit"
-                          className="flex-1 px-4 py-3 bg-brand-primary hover:bg-brand-secondary text-white font-medium rounded-lg hover:bg-brand-primary/80 transition-colors"
+                          className="flex-1 px-4 py-2.5 bg-brand-primary hover:bg-brand-hover text-white text-sm font-bold rounded-lg shadow-sm shadow-brand-primary/10 active:scale-[0.98] transition-all duration-150 cursor-pointer"
                         >
                           Guardar cambios
                         </button>

@@ -51,192 +51,183 @@ export default function UserList() {
   }
 
   return (
-    <div>
-      <h1 className="text-5xl font-black">Gestion de usuarios</h1>
-      <p className="text-2xl font-light text-gray-500 mt-5">
-        Lista de todos los usuarios del sistema
-      </p>
-
-      <button
-        onClick={() => setIsCreateModalOpen(true)}
-        className="mb-4 px-4 py-2 bg-brand-primary text-white rounded-lg hover:bg-brand-primary/80 transition-colors"
-      >
-        Crear Usuario
-      </button>
+    <div className="space-y-6">
+      <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mt-2">
+        <div>
+          <h1 className="text-3xl font-extrabold tracking-tight text-slate-800">Gestión de usuarios</h1>
+          <p className="text-sm font-medium text-slate-400 mt-1">
+            Administra los roles, áreas y accesos de los usuarios del sistema
+          </p>
+        </div>
+        <button
+          onClick={() => setIsCreateModalOpen(true)}
+          className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-primary hover:bg-brand-hover text-white text-sm font-bold rounded-lg shadow-sm shadow-brand-primary/10 transition-all duration-200 hover:-translate-y-0.5 cursor-pointer shrink-0"
+        >
+          <svg className="w-4 h-4 stroke-[2.5]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Crear Usuario
+        </button>
+      </div>
 
       {data && data.users.length ? (
-        <div className="mt-10 bg-white shadow-lg rounded-lg overflow-hidden border border-gray-100">
-          <table className="min-w-full divide-y divide-gray-200">
-              <thead className="bg-gray-50">
+        <div className="bg-white border border-slate-100 rounded-xl overflow-hidden shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+          <div className="overflow-x-auto">
+            <table className="min-w-full divide-y divide-slate-100">
+              <thead className="bg-brand-primary">
                 <tr>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Nombre
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    DNI
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Email
-                  </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-2.5 text-left text-[10px] font-extrabold text-white uppercase tracking-wider">
                     Usuario
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Rol
+                  <th scope="col" className="px-6 py-2.5 text-left text-[10px] font-extrabold text-white uppercase tracking-wider">
+                    DNI
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Área
+                  <th scope="col" className="px-6 py-2.5 text-left text-[10px] font-extrabold text-white uppercase tracking-wider">
+                    Rol / Área
                   </th>
-                  {/* <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    Correo
-                  </th> */}
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-2.5 text-left text-[10px] font-extrabold text-white uppercase tracking-wider">
                     Estado
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-2.5 text-left text-[10px] font-extrabold text-white uppercase tracking-wider">
                     Sede
                   </th>
-                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  <th scope="col" className="px-6 py-2.5 text-right text-[10px] font-extrabold text-white uppercase tracking-wider">
                     Acciones
                   </th>
                 </tr>
               </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {data.users.map((user) => (
-                <tr key={user._id} className="hover:bg-gray-50">
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm font-medium text-gray-900">
-                      {user.name} {user.apellido_paterno} {user.apellido_materno}
-                    </div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.dni || 'N/A'}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.email}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="text-sm text-gray-500">{user.username}</div>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.role?.name === 'admin'
-                        ? 'bg-purple-100 text-purple-800'
-                        : 'bg-green-100 text-green-800'
-                    }`}>
-                      {user.role?.name || 'Sin rol'}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                      {user.area?.name
-                        ? user.area.name.charAt(0).toUpperCase() + user.area.name.slice(1)
-                        : 'Sin área'}
-                    </span>
-                  </td>
-                  {/* <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                      user.confirmed
-                        ? 'bg-green-100 text-green-800'
-                        : 'bg-red-100 text-red-800'
-                    }`}>
-                      {user.confirmed ? 'Confirmado' : 'Pendiente'}
-                    </span>
-                  </td> */}
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <button
-                      onClick={() => setSelectedUser(user)}
-                      className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full cursor-pointer hover:opacity-80 transition-opacity ${
-                        user.estado
-                          ? 'bg-green-100 text-green-800'
-                          : 'bg-gray-100 text-gray-800'
-                      }`}
-                      title="Click para cambiar estado"
-                    >
-                      {user.estado ? 'Activo' : 'Inactivo'}
-                    </button>
-                  </td>
-                  <td className="px-6 py-4">
-                    {user.empresas && user.empresas.length > 0 ? (
-                      <div className="flex flex-wrap gap-1">
-                        {user.empresas.slice(0, 2).map(e => (
-                          <span key={e._id} className="px-2 py-0.5 text-xs rounded-full bg-slate-100 text-slate-600 font-medium whitespace-nowrap">
-                            {e.nombre}
-                          </span>
-                        ))}
-                        {user.empresas.length > 2 && (
-                          <span className="px-2 py-0.5 text-xs rounded-full bg-slate-200 text-slate-500 font-semibold whitespace-nowrap">
-                            +{user.empresas.length - 2}
-                          </span>
-                        )}
+              <tbody className="bg-white divide-y divide-slate-100">
+                {data.users.map((user) => (
+                  <tr key={user._id} className="hover:bg-slate-50/40 transition-colors duration-150 group">
+                    <td className="px-6 py-2.5 whitespace-nowrap">
+                      <div className="flex items-center gap-2.5">
+                        {/* Custom minimalist avatar based on name initials (compact 32px) */}
+                        <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center font-bold text-xs text-slate-600 shrink-0 select-none group-hover:border-brand-primary/20 group-hover:bg-brand-primary/[0.02] transition-colors duration-150">
+                          {user.name.charAt(0).toUpperCase()}
+                          {user.apellido_paterno?.charAt(0).toUpperCase() || ""}
+                        </div>
+                        <div className="min-w-0">
+                          <div className="text-xs font-bold text-slate-700 truncate group-hover:text-slate-900 transition-colors duration-150">
+                            {user.name} {user.apellido_paterno} {user.apellido_materno || ""}
+                          </div>
+                          <div className="text-[11px] text-slate-400 font-normal truncate mt-0">
+                            {user.email} <span className="text-slate-300 mx-0.5 font-light">•</span> @{user.username}
+                          </div>
+                        </div>
                       </div>
-                    ) : (
-                      <span className="text-sm text-gray-500">Sin asignar</span>
-                    )}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap">
-                    <div className="flex gap-2">
+                    </td>
+                    <td className="px-6 py-2.5 whitespace-nowrap">
+                      <div className="text-xs text-slate-500 font-medium">{user.dni || "—"}</div>
+                    </td>
+                    <td className="px-6 py-2.5 whitespace-nowrap">
+                      <div className="text-xs font-bold text-slate-700">
+                        {user.role?.name || "Sin rol"}
+                      </div>
+                      <div className="text-[11px] text-slate-400 font-normal mt-0.5">
+                        {user.area?.name
+                          ? user.area.name.charAt(0).toUpperCase() + user.area.name.slice(1)
+                          : "Sin área"}
+                      </div>
+                    </td>
+                    <td className="px-6 py-2.5 whitespace-nowrap">
                       <button
-                        type="button"
-                        onClick={() => setEditingUserId(user._id)}
-                        className="p-1 text-brand-primary hover:text-brand-dark transition-colors"
-                        title="Editar usuario"
+                        onClick={() => setSelectedUser(user)}
+                        className={`inline-flex items-center gap-1.5 px-2 py-0.5 rounded-full text-[11px] font-semibold border transition-all duration-200 cursor-pointer hover:scale-[1.02] active:scale-[0.98] ${
+                          user.estado
+                            ? "bg-emerald-50 text-emerald-700 border-emerald-100"
+                            : "bg-slate-50 text-slate-500 border-slate-100"
+                        }`}
+                        title="Click para cambiar estado"
                       >
-                        <PencilIcon className="h-5 w-5" />
+                        <span className={`w-1.5 h-1.5 rounded-full ${user.estado ? "bg-emerald-500 animate-pulse" : "bg-slate-400"}`} />
+                        {user.estado ? "Activo" : "Inactivo"}
                       </button>
-                      <button
-                        type="button"
-                        onClick={() => setResetPasswordUserId({ id: user._id, name: `${user.name} ${user.apellido_paterno}` })}
-                        className="p-1 text-gray-600 hover:text-gray-900 transition-colors"
-                        title="Restablecer contraseña"
-                      >
-                        <KeyIcon className="h-5 w-5" />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          <div className="flex items-center justify-between px-6 py-3 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
+                    </td>
+                    <td className="px-6 py-2.5">
+                      {user.empresas && user.empresas.length > 0 ? (
+                        <div className="flex flex-wrap gap-1">
+                          {user.empresas.slice(0, 2).map((e) => (
+                            <span key={e._id} className="px-2 py-0.5 text-[9px] rounded bg-slate-50 text-slate-500 border border-slate-100 font-medium whitespace-nowrap">
+                              {e.nombre}
+                            </span>
+                          ))}
+                          {user.empresas.length > 2 && (
+                            <span
+                              className="px-1.5 py-0.5 text-[9px] rounded bg-slate-100 text-slate-500 font-semibold whitespace-nowrap cursor-default"
+                              title={user.empresas.slice(2).map((e) => e.nombre).join(", ")}
+                            >
+                              +{user.empresas.length - 2}
+                            </span>
+                          )}
+                        </div>
+                      ) : (
+                        <span className="text-[10px] text-slate-300 font-light">—</span>
+                      )}
+                    </td>
+                    <td className="px-6 py-2.5 whitespace-nowrap text-right">
+                      <div className="flex items-center justify-end gap-1">
+                        <button
+                          type="button"
+                          onClick={() => setEditingUserId(user._id)}
+                          className="p-1 text-slate-400 hover:text-brand-primary hover:bg-slate-50 rounded-lg transition-all duration-200 cursor-pointer"
+                          title="Editar usuario"
+                        >
+                          <PencilIcon className="h-4 w-4" />
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setResetPasswordUserId({ id: user._id, name: `${user.name} ${user.apellido_paterno}` })}
+                          className="p-1 text-slate-400 hover:text-slate-800 hover:bg-slate-50 rounded-lg transition-all duration-200 cursor-pointer"
+                          title="Restablecer contraseña"
+                        >
+                          <KeyIcon className="h-4 w-4" />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className="flex items-center justify-between px-6 py-3 border-t border-slate-100 bg-slate-50/20">
+            <p className="text-xs text-slate-400 font-medium">
               Mostrando {offset + 1}–{Math.min(page * PAGE_SIZE, data.total)} de {data.total} usuarios
             </p>
             <div className="flex items-center gap-1">
               <button
                 disabled={page === 1}
                 onClick={() => setPage((p) => p - 1)}
-                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 aria-label="Página anterior"
               >
-                <ChevronLeftIcon className="h-5 w-5" />
+                <ChevronLeftIcon className="h-4 w-4" />
               </button>
               {Array.from({ length: Math.ceil(data.total / PAGE_SIZE) }, (_, i) => i + 1)
-                .reduce<(number | '...')[]>((pages, p, _i, all) => {
-                  const first = p === 1
-                  const last = p === all.length
-                  const near = Math.abs(p - page) <= 1
-                  const prevIsEllipsis = pages[pages.length - 1] === '...'
+                .reduce<(number | "...")[]>((pages, p, _i, all) => {
+                  const first = p === 1;
+                  const last = p === all.length;
+                  const near = Math.abs(p - page) <= 1;
+                  const prevIsEllipsis = pages[pages.length - 1] === "...";
                   if (first || last || near) {
-                    pages.push(p)
+                    pages.push(p);
                   } else if (!prevIsEllipsis) {
-                    pages.push('...')
+                    pages.push("...");
                   }
-                  return pages
+                  return pages;
                 }, [])
                 .map((item, i) =>
-                  item === '...' ? (
-                    <span key={`ellipsis-${i}`} className="px-2 text-sm text-gray-400 select-none">
+                  item === "..." ? (
+                    <span key={`ellipsis-${i}`} className="px-2 text-xs text-slate-300 select-none">
                       ...
                     </span>
                   ) : (
                     <button
                       key={item}
                       onClick={() => setPage(item)}
-                      className={`min-w-[32px] h-8 text-sm font-medium rounded-md transition-colors ${
+                      className={`min-w-[28px] h-7 text-xs font-semibold rounded-md transition-all duration-150 cursor-pointer ${
                         item === page
-                          ? 'bg-brand-primary text-white shadow-sm'
-                          : 'text-gray-600 hover:bg-gray-100'
+                          ? "bg-brand-primary text-white shadow-sm"
+                          : "text-slate-500 hover:bg-slate-100"
                       }`}
                     >
                       {item}
@@ -246,27 +237,38 @@ export default function UserList() {
               <button
                 disabled={page * PAGE_SIZE >= data.total}
                 onClick={() => setPage((p) => p + 1)}
-                className="p-1.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+                className="p-1.5 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-md disabled:opacity-30 disabled:cursor-not-allowed transition-colors cursor-pointer"
                 aria-label="Página siguiente"
               >
-                <ChevronRightIcon className="h-5 w-5" />
+                <ChevronRightIcon className="h-4 w-4" />
               </button>
             </div>
           </div>
         </div>
       ) : (
-        <p className="text-2xl font-light text-gray-500 mt-5">
-          No hay usuarios registrados aún
-        </p>
+        <div className="bg-white border border-slate-100 rounded-xl p-12 text-center shadow-[0_2px_12px_rgba(0,0,0,0.02)]">
+          <p className="text-lg font-semibold text-slate-500">
+            No hay usuarios registrados aún
+          </p>
+          <p className="text-sm text-slate-400 mt-1 mb-6">
+            Comienza creando el primer usuario del sistema.
+          </p>
+          <button
+            onClick={() => setIsCreateModalOpen(true)}
+            className="inline-flex items-center justify-center gap-1.5 px-4 py-2 bg-brand-primary hover:bg-brand-hover text-white text-sm font-bold rounded-lg shadow-sm shadow-brand-primary/10 transition-all duration-200 cursor-pointer"
+          >
+            Crear Usuario
+          </button>
+        </div>
       )}
       <UserStatusModal
         show={selectedUser !== null}
-        userName={selectedUser ? `${selectedUser.name} ${selectedUser.apellido_paterno} ${selectedUser.apellido_materno}` : ''}
+        userName={selectedUser ? `${selectedUser.name} ${selectedUser.apellido_paterno} ${selectedUser.apellido_materno}` : ""}
         currentStatus={selectedUser?.estado ?? false}
         onConfirm={() => {
           if (selectedUser) {
-            mutate({ userId: selectedUser._id, estado: !selectedUser.estado })
-            setSelectedUser(null)
+            mutate({ userId: selectedUser._id, estado: !selectedUser.estado });
+            setSelectedUser(null);
           }
         }}
         onClose={() => setSelectedUser(null)}
@@ -276,7 +278,7 @@ export default function UserList() {
         onClose={() => setEditingUserId(null)}
         userId={editingUserId}
       />
-       <UserCreateModal
+      <UserCreateModal
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
       />

@@ -1,9 +1,8 @@
 import { useState } from "react";
-import { DndContext, DragEndEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
-import TaskCard from "../../components/TaskCard";
-import { statusTranslation } from "../../traductor/es";
+import { DndContext, DragEndEvent, DragOverEvent, DragOverlay, DragStartEvent } from "@dnd-kit/core";
 import { TaskProject, TaskStatus, StatusChangeResponse, ProjectsResponse } from "../../types";
-import DropTask from "./DropTask";
+import TaskColumn from "../../components/tasks/TaskColumn";
+import { statusColors } from "../../traductor/es";
 import { updateStatusTask } from "../../api/task.api";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import Swal from "sweetalert2";
@@ -27,20 +26,13 @@ const initialStatusGroup: GroupedTask = {
   completed: [],
 };
 
-const statusStyles: { [key: string]: string } = {
-  pending: 'border-t-slate-500',
-  onHold: 'border-t-red-500',
-  inProgress: 'border-t-blue-500',
-  underReview: 'border-t-amber-500',
-  completed: 'border-t-emerald-500',
-};
-
 export default function TaskList({ tasks, canEdit }: TaskListProps) {
 
   const params = useParams()
   const projectId  = params.projectId!
   const queryClient = useQueryClient()
   const [activeTask, setActiveTask] = useState<TaskProject | null>(null)
+  const [activeOverStatus, setActiveOverStatus] = useState<TaskStatus | null>(null)
 
   //Aqui se maneja el esatdo de las tareas
   const { mutate } = useMutation<StatusChangeResponse, Error, { projectId: string; taskId: string; status: TaskStatus }>({
@@ -98,8 +90,16 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
     if (task) setActiveTask(task)
   }
 
+  const handleDragOver = (e: DragOverEvent) => {
+    const overId = e.over?.id?.toString()
+    if (overId && ["pending", "onHold", "inProgress", "underReview", "completed"].includes(overId)) {
+      setActiveOverStatus(overId as TaskStatus)
+    }
+  }
+
   const handleDragEnd = (e : DragEndEvent) => {
     setActiveTask(null)
+    setActiveOverStatus(null)
     const {over ,  active} = e
     
     if(over && over.id) {
@@ -108,43 +108,27 @@ export default function TaskList({ tasks, canEdit }: TaskListProps) {
       mutate({projectId,taskId, status})
     }
     
-  } 
+  }
+
+  const overlayBorderClass = activeOverStatus
+    ? (statusColors[activeOverStatus]?.overlayBorder ?? "border-l-transparent")
+    : "border-l-transparent"
+
   return (
     <div>
       <h2 className="text-5xl font-black my-10">Tareas</h2>
 
-      <div className="flex gap-5 overflow-x-scroll 2xl:overflow-auto pb-32">
+      <div className="flex gap-4 pb-32">
 
-        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
+        <DndContext onDragStart={handleDragStart} onDragEnd={handleDragEnd} onDragOver={handleDragOver}>
           {Object.entries(groupedTasks).map(([status, tasks]) => (
-            <div key={status} className="min-w-[300px] 2xl:min-w-0 2xl:w-1/5">
-              <ul className="mt-5 space-y-5">
-                <h3
-                  className={`capitalize text-xl font-light border border-slate-300
-                      bg-white p-3 border-t-8 ${statusStyles[status]}`}
-                >
-                  {statusTranslation[status]}
-                </h3>
-
-                <DropTask status={status} />
-
-                {tasks.length === 0 ? (
-                  <li className="text-gray-500 text-center pt-3">
-                    No Hay tareas
-                  </li>
-                ) : (
-                  tasks.map((task) => (
-                    <TaskCard key={task._id} task={task} canEdit={canEdit} />
-                  ))
-                )}
-              </ul>
-            </div>
+            <TaskColumn key={status} status={status} tasks={tasks} canEdit={canEdit} />
           ))}
           <DragOverlay>
             {activeTask ? (
-              <div className="p-5 bg-white border border-slate-300 w-[300px] shadow-lg rounded-sm">
-                <p className="text-xl font-bold text-slate-900">{activeTask.name}</p>
-                <p className="text-slate-500 mt-2">{activeTask.description}</p>
+              <div className={`p-4 bg-white rounded-lg shadow-lg w-[300px] border-l-4 ${overlayBorderClass}`}>
+                <p className="font-bold text-slate-900">{activeTask.name}</p>
+                <p className="text-slate-500 text-sm mt-1">{activeTask.description}</p>
               </div>
             ) : null}
           </DragOverlay>

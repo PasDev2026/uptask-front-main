@@ -28,6 +28,22 @@ export const taskStatusStyles: Record<string, string> = {
     completed: "bg-emerald-100 text-emerald-600 border-emerald-300",
 };
 
+export type StatusColorSet = {
+  dot: string
+  columnBg: string
+  cardBorder: string
+  cardBg: string
+  overlayBorder: string
+}
+
+export const statusColors: Record<string, StatusColorSet> = {
+  pending:      { dot: "bg-slate-500",     columnBg: "bg-slate-50",   cardBorder: "border-l-slate-500",   cardBg: "bg-slate-100",   overlayBorder: "border-l-slate-500" },
+  onHold:       { dot: "bg-red-500",       columnBg: "bg-red-50",    cardBorder: "border-l-red-500",     cardBg: "bg-red-100",     overlayBorder: "border-l-red-500" },
+  inProgress:   { dot: "bg-blue-500",      columnBg: "bg-blue-50",   cardBorder: "border-l-blue-500",    cardBg: "bg-blue-100",    overlayBorder: "border-l-blue-500" },
+  underReview:  { dot: "bg-amber-500",     columnBg: "bg-amber-50",  cardBorder: "border-l-amber-500",   cardBg: "bg-amber-100",  overlayBorder: "border-l-amber-500" },
+  completed:    { dot: "bg-emerald-500",   columnBg: "bg-emerald-50",cardBorder: "border-l-emerald-500", cardBg: "bg-emerald-100",overlayBorder: "border-l-emerald-500" },
+}
+
 export const projectStatusTranslation: Record<string, string> = {
     planning: "Planificación",
     active: "Activo",

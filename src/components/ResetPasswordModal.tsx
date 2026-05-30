@@ -18,15 +18,15 @@ type ResetPasswordForm = {
 
 export default function ResetPasswordModal({ userId, userName, onClose }: ResetPasswordModalProps) {
   const queryClient = useQueryClient();
-  const { register, handleSubmit, watch, formState: { errors } } = useForm<ResetPasswordForm>();
+  const { register, handleSubmit, formState: { errors } } = useForm<ResetPasswordForm>();
 
   const { mutate, isPending } = useMutation({
-    mutationFn: () => resetUserPassword(userId, watch('password')),
+    mutationFn: (formData: ResetPasswordForm) => resetUserPassword(userId, formData.password),
     onError: (error) => {
       Swal.fire({
         icon: "error",
-        title: error.message,
-        text: "Ocurrió un error al restablecer la contraseña",
+        title: "Error",
+        text: error.message || "Ocurrió un error al restablecer la contraseña",
       });
     },
     onSuccess: () => {
@@ -36,16 +36,16 @@ export default function ResetPasswordModal({ userId, userName, onClose }: ResetP
         text: `La contraseña de ${userName} fue restablecida correctamente`,
         confirmButtonColor: "#2DAAA5",
       });
-      queryClient.invalidateQueries({ queryKey: ['users'] });
+      queryClient.invalidateQueries({ queryKey: ["users"] });
       onClose();
     },
   });
 
-  const onSubmit = () => mutate();
+  const onSubmit = (formData: ResetPasswordForm) => mutate(formData);
 
   return (
     <Transition appear show={true} as={Fragment}>
-      <Dialog as="div" className="relative z-10" onClose={onClose}>
+      <Dialog as="div" className="relative z-50" onClose={onClose}>
         <Transition.Child
           as={Fragment}
           enter="ease-out duration-300"
@@ -69,59 +69,63 @@ export default function ResetPasswordModal({ userId, userName, onClose }: ResetP
               leaveFrom="opacity-100 scale-100"
               leaveTo="opacity-0 scale-95"
             >
-              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-8 text-left align-middle shadow-xl transition-all">
-                <Dialog.Title as="h3" className="text-2xl font-black mb-4">
+              <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-white p-7 text-left align-middle shadow-[0_15px_40px_rgba(0,0,0,0.08)] border border-slate-100/60 transition-all">
+                <Dialog.Title as="h3" className="text-xl font-extrabold tracking-tight text-slate-800 mb-2">
                   Restablecer contraseña
                 </Dialog.Title>
 
-                <p className="text-lg text-gray-600 mb-6">
-                  Nueva contraseña para <span className="font-bold text-gray-900">{userName}</span>
+                <p className="text-sm text-slate-400 mb-6 font-medium">
+                  Nueva contraseña para <span className="font-bold text-slate-700">{userName}</span>
                 </p>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
-                  <div>
-                    <label className="font-medium text-gray-700 block mb-1">Nueva contraseña</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
+                      Nueva contraseña
+                    </label>
                     <input
                       type="password"
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                       {...register("password", {
                         required: "La contraseña es obligatoria",
                         minLength: { value: 8, message: "Debe tener al menos 8 caracteres" },
                       })}
                     />
                     {errors.password && (
-                      <p className="text-red-500 text-sm mt-1">{errors.password.message}</p>
+                      <p className="text-xs text-red-500 font-semibold mt-1">{errors.password.message}</p>
                     )}
                   </div>
 
-                  <div>
-                    <label className="font-medium text-gray-700 block mb-1">Confirmar contraseña</label>
+                  <div className="flex flex-col gap-1">
+                    <label className="text-[10px] font-extrabold uppercase tracking-wider text-slate-400 mb-1 select-none">
+                      Confirmar contraseña
+                    </label>
                     <input
                       type="password"
-                      className="w-full p-3 border border-gray-300 rounded-lg"
+                      className="w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50/20 text-slate-700 focus:ring-4 focus:ring-brand-primary/10 focus:border-brand-primary focus:outline-none transition-all duration-150"
                       {...register("password_confirmation", {
                         required: "Confirma la contraseña",
-                        validate: (value) => value === watch('password') || "Las contraseñas no coinciden",
+                        validate: (value, formValues) => value === formValues.password || "Las contraseñas no coinciden",
                       })}
                     />
                     {errors.password_confirmation && (
-                      <p className="text-red-500 text-sm mt-1">{errors.password_confirmation.message}</p>
+                      <p className="text-xs text-red-500 font-semibold mt-1">{errors.password_confirmation.message}</p>
                     )}
                   </div>
 
-                  <div className="mt-8 flex gap-4">
+                  <div className="mt-8 flex gap-3">
                     <button
                       type="button"
                       onClick={onClose}
                       disabled={isPending}
-                      className="flex-1 px-4 py-3 border border-gray-300 rounded-lg text-gray-700 font-medium hover:bg-gray-50 transition-colors disabled:opacity-50"
+                      className="flex-1 px-4 py-2.5 border border-slate-200 rounded-lg text-slate-500 text-sm font-bold hover:bg-slate-50 active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       Cancelar
                     </button>
                     <button
                       type="submit"
                       disabled={isPending}
-                      className="flex-1 px-4 py-3 rounded-lg text-white font-medium transition-colors bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50"
+                      className="flex-1 px-4 py-2.5 bg-brand-primary hover:bg-brand-hover text-white text-sm font-bold rounded-lg shadow-sm shadow-brand-primary/10 active:scale-[0.98] transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
                     >
                       {isPending ? "Restableciendo..." : "Restablecer"}
                     </button>
