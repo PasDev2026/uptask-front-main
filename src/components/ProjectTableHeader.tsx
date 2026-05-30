@@ -12,7 +12,7 @@ export default function ProjectTableHeader({ sortBy, sortOrder, onSort }: Projec
 
   return (
     <div
-      className="grid items-center px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-100 bg-white divide-x divide-slate-100"
+      className="grid items-center px-4 py-2 text-xs font-semibold text-slate-400 uppercase tracking-wider border-b border-slate-200 bg-white divide-x divide-slate-100 sticky top-[68px] z-10 shadow-sm"
       style={{ gridTemplateColumns: TABLE_GRID }}
     >
       <div />
