@@ -1,13 +1,14 @@
 import { Menu, Transition } from "@headlessui/react";
 import { TaskProject } from "../types";
-import { Fragment } from "react";
+import { Fragment, useRef, useState } from "react";
 import { EllipsisVerticalIcon } from "@heroicons/react/20/solid";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useLocation } from "react-router-dom";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { deleteTaskApi } from "../api/task.api";
 import Swal from "sweetalert2";
 import { useDraggable } from '@dnd-kit/core'
 import PriorityBadge from "./PriorityBadge";
+import { useUpdateTaskName } from "../hooks/useUpdateTaskName";
 import { statusColors } from "../traductor/es";
 
 type TaskCardProps = {
@@ -21,10 +22,52 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
   });
 
   const navigate = useNavigate();
+  const location = useLocation();
   const paramas = useParams();
   const projectId = paramas.projectId!;
-
+  const updateTaskName = useUpdateTaskName();
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState("")
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const queryClient = useQueryClient();
+
+  const handleTaskNameClick = () => {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+      return
+    }
+    clickTimer.current = setTimeout(() => {
+      clickTimer.current = null
+      navigate(location.pathname + `?viewTask=${task._id}`)
+    }, 250)
+  }
+
+  const handleTaskNameDoubleClick = () => {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+    }
+    setEditValue(task.name)
+    setIsEditing(true)
+  }
+
+  const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && editValue.trim()) {
+      updateTaskName.mutate({
+        projectId,
+        taskId: task._id,
+        name: editValue.trim(),
+        description: task.description ?? "",
+      })
+      setIsEditing(false)
+      setEditValue("")
+    }
+    if (e.key === "Escape") {
+      setIsEditing(false)
+      setEditValue("")
+    }
+  }
 
   const { mutate } = useMutation({
     mutationFn: deleteTaskApi,
@@ -56,14 +99,28 @@ export default function TaskCard({ task, canEdit }: TaskCardProps) {
         ref={setNodeRef}
       className="min-w-0 flex flex-col gap-y-4">
         <div className="flex items-center gap-2">
-          <p
-            className="text-xl font-bold text-slate-900 hover:text-slate-700"
-            onClick={() =>
-              navigate(location.pathname + `?viewTask=${task._id}`)
-            }
-          >
-            {task.name}
-          </p>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={handleEditKeyDown}
+              onBlur={() => {
+                setIsEditing(false)
+                setEditValue("")
+              }}
+              autoFocus
+              className="flex-1 text-xl font-bold text-slate-900 border border-brand-primary rounded px-2 py-0.5 focus:outline-none min-w-0"
+            />
+          ) : (
+            <span
+              onClick={handleTaskNameClick}
+              onDoubleClick={handleTaskNameDoubleClick}
+              className="text-xl font-bold text-slate-900 hover:text-slate-700 cursor-pointer"
+            >
+              {task.name}
+            </span>
+          )}
           <PriorityBadge priority={task.priority} />
         </div>
         <p className="text-slate-500 text-sm">{task.description}</p>

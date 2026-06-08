@@ -56,6 +56,24 @@ export async function updateTaskApi({projectId, taskId, formData}: Pick<TaskAPI,
     }
 }
 
+export async function updateTaskName(
+    projectId: string,
+    taskId: string,
+    name: string,
+    description: string
+) {
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
+        const url = `/dashboard/${projectId}/tasks/${taskId}`
+        const { data } = await api.put<string>(url, { name, description }, { headers: { Authorization: `Bearer ${token}` } })
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error ?? 'Error al actualizar nombre de la tarea')
+        }
+    }
+}
+
 export async function updateTaskDates(
     projectId: string,
     taskId: string,

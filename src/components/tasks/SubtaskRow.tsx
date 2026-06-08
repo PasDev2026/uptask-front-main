@@ -8,6 +8,7 @@ import PriorityPopover from "../PriorityPopover"
 import { useUpdateTaskPriority } from "../../hooks/useUpdateTaskPriority"
 import { useUpdateTaskStatus } from "../../hooks/useUpdateTaskStatus"
 import { useUpdateTaskAssignee } from "../../hooks/useUpdateTaskAssignee"
+import { useUpdateTaskName } from "../../hooks/useUpdateTaskName"
 import { useDeleteTask } from "../../hooks/useDeleteTask"
 import TaskDateCellPopover from "../TaskDateCellPopover"
 import { TABLE_GRID } from "../../constants/tableColumns"
@@ -21,16 +22,21 @@ type SubtaskRowProps = {
   depth: number
   projectStartDate?: string | null
   projectDueDate?: string | null
+  filterType?: 'project' | 'task' | null
+  filterStatus?: string | null
 }
 
-export default function SubtaskRow({ subtask, projectId, canEdit, depth, projectStartDate, projectDueDate }: SubtaskRowProps) {
+export default function SubtaskRow({ subtask, projectId, canEdit, depth, projectStartDate, projectDueDate, filterType, filterStatus }: SubtaskRowProps) {
   const [expanded, setExpanded] = useState(false)
   const [showForm, setShowForm] = useState(false)
   const [newTaskName, setNewTaskName] = useState("")
+  const [isEditing, setIsEditing] = useState(false)
+  const [editValue, setEditValue] = useState("")
   const queryClient = useQueryClient()
   const updateTaskPriority = useUpdateTaskPriority()
   const updateTaskStatus = useUpdateTaskStatus()
   const updateTaskAssignee = useUpdateTaskAssignee()
+  const updateTaskName = useUpdateTaskName()
   const deleteTask = useDeleteTask()
 
   const handleDeleteSubtask = (taskId: string, parentTaskId: string | null) => {
@@ -56,6 +62,10 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
     enabled: expanded,
     staleTime: 30000,
   })
+
+  const visibleChildren = filterType === 'task' && filterStatus
+    ? children.filter((c: Task) => c.status === filterStatus)
+    : children
 
   const createSubtask = useMutation({
     mutationFn: async (name: string) => {
@@ -105,9 +115,45 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
               <ChevronRightIcon className="h-3.5 w-3.5 text-gray-400" />
             )}
           </button>
-          <span className="text-sm text-slate-700 truncate">
-            {subtask.name}
-          </span>
+          {isEditing ? (
+            <input
+              type="text"
+              value={editValue}
+              onChange={(e) => setEditValue(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter" && editValue.trim()) {
+                  updateTaskName.mutate({
+                    projectId,
+                    taskId: subtask._id,
+                    name: editValue.trim(),
+                    description: subtask.description ?? "",
+                  })
+                  setIsEditing(false)
+                  setEditValue("")
+                }
+                if (e.key === "Escape") {
+                  setIsEditing(false)
+                  setEditValue("")
+                }
+              }}
+              onBlur={() => {
+                setIsEditing(false)
+                setEditValue("")
+              }}
+              autoFocus
+              className="flex-1 text-sm text-slate-700 border border-brand-primary rounded px-2 py-0.5 focus:outline-none min-w-0"
+            />
+          ) : (
+            <span
+              onDoubleClick={() => {
+                setEditValue(subtask.name)
+                setIsEditing(true)
+              }}
+              className="text-sm text-slate-700 truncate"
+            >
+              {subtask.name}
+            </span>
+          )}
         </div>
         <div>
             {/* column de empresa o sede, por ahora vacia */}
@@ -164,7 +210,7 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
 
       {expanded && (
         <div>
-          {children.map((child: Task) => (
+          {visibleChildren.map((child: Task) => (
             <SubtaskRow
               key={child._id}
               subtask={child}
@@ -173,6 +219,8 @@ export default function SubtaskRow({ subtask, projectId, canEdit, depth, project
               depth={depth + 1}
               projectStartDate={projectStartDate}
               projectDueDate={projectDueDate}
+              filterType={filterType}
+              filterStatus={filterStatus}
             />
           ))}
 

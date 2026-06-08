@@ -11,9 +11,11 @@ type TaskTableSubtasksProps = {
   depth?: number
   projectStartDate?: string | null
   projectDueDate?: string | null
+  filterType?: 'project' | 'task' | null
+  filterStatus?: string | null
 }
 
-export default function TaskTableSubtasks({ taskId, projectId, canEdit, depth = 0, projectStartDate, projectDueDate }: TaskTableSubtasksProps) {
+export default function TaskTableSubtasks({ taskId, projectId, canEdit, depth = 0, projectStartDate, projectDueDate, filterType, filterStatus }: TaskTableSubtasksProps) {
   const [showForm, setShowForm] = useState(false)
   const [newTaskName, setNewTaskName] = useState("")
   const queryClient = useQueryClient()
@@ -58,6 +60,8 @@ export default function TaskTableSubtasks({ taskId, projectId, canEdit, depth = 
           depth={depth}
           projectStartDate={projectStartDate}
           projectDueDate={projectDueDate}
+          filterType={filterType}
+          filterStatus={filterStatus}
         />
       ))}
 

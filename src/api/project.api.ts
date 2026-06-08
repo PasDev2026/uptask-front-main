@@ -15,7 +15,7 @@ export async function createProject(formData:ProjectFormData) {
     }
 }
 
-export async function getProjects(filters?: { search?: string; dateFrom?: string; dateTo?: string; empresa?: string; offset?: number; limit?: number; sortBy?: string; sortOrder?: string }){
+export async function getProjects(filters?: { search?: string; dateFrom?: string; dateTo?: string; empresa?: string; status?: string; offset?: number; limit?: number; sortBy?: string; sortOrder?: string }){
     const token = localStorage.getItem('AUTH_TOKEN')
     try {
         const params: Record<string, string> = {}
@@ -23,6 +23,7 @@ export async function getProjects(filters?: { search?: string; dateFrom?: string
         if (filters?.dateFrom) params.dateFrom = filters.dateFrom
         if (filters?.dateTo) params.dateTo = filters.dateTo
         if (filters?.empresa) params.empresa = filters.empresa
+        if (filters?.status) params.status = filters.status
         if (filters?.offset !== undefined) params.offset = String(filters.offset)
         if (filters?.limit !== undefined) params.limit = String(filters.limit)
         if (filters?.sortBy) params.sortBy = filters.sortBy
@@ -114,6 +115,26 @@ export async function getProjectTasks(projectId: Project['_id']) {
     } catch (error) {
         if (isAxiosError(error) && error.response) {
             throw new Error('Error al cargar tareas')
+        }
+    }
+}
+
+export async function updateProjectName(
+    projectId: Project['_id'],
+    projectName: string,
+    description: string
+) {
+    const token = localStorage.getItem('AUTH_TOKEN')
+    try {
+        const { data } = await api.put<string>(
+            `/dashboard/projects/${projectId}`,
+            { projectName, description },
+            { headers: { Authorization: `Bearer ${token}` } }
+        )
+        return data
+    } catch (error) {
+        if (isAxiosError(error) && error.response) {
+            throw new Error(error.response.data.error ?? 'Error al actualizar nombre del proyecto')
         }
     }
 }

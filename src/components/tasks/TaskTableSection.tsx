@@ -1,5 +1,5 @@
-import { useState } from "react"
-import { Link } from "react-router-dom"
+import { useState, useRef } from "react"
+import { Link, useNavigate } from "react-router-dom"
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query"
 import { getProjectTasks } from "../../api/project.api"
 import { createTask } from "../../api/task.api"
@@ -11,6 +11,7 @@ import PriorityPopover from "../PriorityPopover"
 import { useUpdateTaskPriority } from "../../hooks/useUpdateTaskPriority"
 import { useUpdateTaskStatus } from "../../hooks/useUpdateTaskStatus"
 import { useUpdateTaskAssignee } from "../../hooks/useUpdateTaskAssignee"
+import { useUpdateTaskName } from "../../hooks/useUpdateTaskName"
 import { useDeleteTask } from "../../hooks/useDeleteTask"
 import TaskDateCellPopover from "../TaskDateCellPopover"
 import { TABLE_GRID } from "../../constants/tableColumns"
@@ -23,12 +24,19 @@ type TaskTableSectionProps = {
   depth?: number
   projectStartDate?: string | null
   projectDueDate?: string | null
+  filterType?: 'project' | 'task' | null
+  filterStatus?: string | null
 }
 
-export default function TaskTableSection({ projectId, canEdit, depth = 1, projectStartDate, projectDueDate }: TaskTableSectionProps) {
+export default function TaskTableSection({ projectId, canEdit, depth = 1, projectStartDate, projectDueDate, filterType, filterStatus }: TaskTableSectionProps) {
   const [expandedTasks, setExpandedTasks] = useState<Set<string>>(new Set())
   const [showForm, setShowForm] = useState(false)
   const [newTaskName, setNewTaskName] = useState("")
+  const [editingTaskId, setEditingTaskId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState("")
+  const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const navigate = useNavigate()
+  const updateTaskName = useUpdateTaskName()
   const queryClient = useQueryClient()
 
   const { data, isLoading, isError } = useQuery<TaskPreviewResponse>({
@@ -86,6 +94,44 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
     })
   }
 
+  const handleTaskNameClick = (taskId: string) => {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+      return
+    }
+    clickTimer.current = setTimeout(() => {
+      clickTimer.current = null
+      navigate(`/projects/${projectId}/details-projects?viewTask=${taskId}`)
+    }, 250)
+  }
+
+  const handleTaskNameDoubleClick = (taskId: string, taskName: string) => {
+    if (clickTimer.current) {
+      clearTimeout(clickTimer.current)
+      clickTimer.current = null
+    }
+    setEditValue(taskName)
+    setEditingTaskId(taskId)
+  }
+
+  const handleTaskNameEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>, taskId: string, description: string) => {
+    if (e.key === "Enter" && editValue.trim()) {
+      updateTaskName.mutate({
+        projectId,
+        taskId,
+        name: editValue.trim(),
+        description,
+      })
+      setEditingTaskId(null)
+      setEditValue("")
+    }
+    if (e.key === "Escape") {
+      setEditingTaskId(null)
+      setEditValue("")
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="px-4 py-4 flex items-center justify-center">
@@ -105,6 +151,12 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
   const rootTasks = data.tasks.filter((t) => !t.parentTask)
   const displayLimit = 10
   const visibleTasks = rootTasks.slice(0, displayLimit)
+  const displayedTasks = filterType === 'task' && filterStatus
+    ? visibleTasks.filter(t => t.status === filterStatus)
+    : visibleTasks
+  const matchingRootCount = filterType === 'task' && filterStatus
+    ? rootTasks.filter(t => t.status === filterStatus).length
+    : rootTasks.length
 
   if (rootTasks.length === 0) {
     return (
@@ -157,21 +209,19 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
             >
               <XMarkIcon className="h-3.5 w-3.5" />
             </button>
-          </div>
-        )}
-      </div>
-    )
+        </div>
+      )}
+    </div>
+  )
   }
 
   return (
     <div className="border-t border-slate-100">
-      {visibleTasks.map((task) => (
+      {displayedTasks.map((task) => (
         <div key={task._id} className="border-b border-slate-50 last:border-b-0">
           <div
-            //SIN cursor-pointer
             className="grid items-center px-4 py-2.5 hover:bg-slate-50 transition-colors divide-x divide-slate-100 group"
             style={{ gridTemplateColumns: TABLE_GRID }}
-            //onClick={() => navigate(`/projects/${projectId}/details-projects?viewTask=${task._id}`)}
           >
             <div
               className="flex items-center gap-2 min-w-0"
@@ -197,12 +247,28 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
                   <ChevronRightIcon className="h-3.5 w-3.5" />
                 )}
               </button>
-              <Link
-                to={`/projects/${projectId}/details-projects?viewTask=${task._id}`}
-                className="text-sm font-medium text-slate-800 truncate hover:text-brand-primary hover:underline"
-              >
-                {task.name}
-              </Link>
+              {editingTaskId === task._id ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => handleTaskNameEditKeyDown(e, task._id, task.description ?? "")}
+                  onBlur={() => {
+                    setEditingTaskId(null)
+                    setEditValue("")
+                  }}
+                  autoFocus
+                  className="flex-1 text-sm font-medium text-slate-800 border border-brand-primary rounded px-2 py-0.5 focus:outline-none min-w-0"
+                />
+              ) : (
+                <span
+                  onClick={() => handleTaskNameClick(task._id)}
+                  onDoubleClick={() => handleTaskNameDoubleClick(task._id, task.name)}
+                  className="text-sm font-medium text-slate-800 truncate hover:text-brand-primary hover:underline cursor-pointer"
+                >
+                  {task.name}
+                </span>
+              )}
             </div>
             <div>
               {/* column de empresa o sede, por ahora vacia */}
@@ -266,18 +332,20 @@ export default function TaskTableSection({ projectId, canEdit, depth = 1, projec
               depth={depth + 1}
               projectStartDate={projectStartDate}
               projectDueDate={projectDueDate}
+              filterType={filterType}
+              filterStatus={filterStatus}
             />
           )}
         </div>
       ))}
 
-      {rootTasks.length > displayLimit && (
+      {(matchingRootCount > displayLimit || displayedTasks.length < matchingRootCount) && (
         <div className="px-4 py-3 text-center border-t border-slate-100">
           <Link
             to={`/projects/${projectId}/details-projects`}
             className="text-xs text-brand-primary hover:text-brand-dark hover:underline"
           >
-            Mostrando {visibleTasks.length} de {rootTasks.length} tareas. Ver todas &rarr;
+            Mostrando {displayedTasks.length} de {matchingRootCount} tareas. Ver todas &rarr;
           </Link>
         </div>
       )}

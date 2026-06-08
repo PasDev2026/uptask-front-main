@@ -1,13 +1,17 @@
 import { ChevronUpIcon, ChevronDownIcon } from "@heroicons/react/20/solid"
 import { TABLE_GRID } from "../constants/tableColumns"
+import StatusColumnFilter from "./StatusColumnFilter"
 
 type ProjectTableHeaderProps = {
   sortBy?: string
   sortOrder?: string
   onSort: (field: string) => void
+  filterType: 'project' | 'task' | null
+  filterStatus: string | null
+  onFilterChange: (type: 'project' | 'task' | null, status: string | null) => void
 }
 
-export default function ProjectTableHeader({ sortBy, sortOrder, onSort }: ProjectTableHeaderProps) {
+export default function ProjectTableHeader({ sortBy, sortOrder, onSort, filterType, filterStatus, onFilterChange }: ProjectTableHeaderProps) {
   const isActive = sortBy === 'projectName'
 
   return (
@@ -27,7 +31,13 @@ export default function ProjectTableHeader({ sortBy, sortOrder, onSort }: Projec
         </span>
       </div>
       <div>Sede</div>
-      <div>Estado</div>
+      <div>
+        <StatusColumnFilter
+          filterType={filterType}
+          filterStatus={filterStatus}
+          onChange={onFilterChange}
+        />
+      </div>
       <div>Responsable</div>
       <div>Prioridad</div>
       <div>Fecha</div>

@@ -36,6 +36,8 @@ export default function Dashboard() {
     const [empresaInput, setEmpresaInput] = useState(() => searchParams.get("empresa") || "")
     const [dateFromInput, setDateFromInput] = useState(() => searchParams.get("dateFrom") || "")
     const [dateToInput, setDateToInput] = useState(() => searchParams.get("dateTo") || "")
+    const [filterTypeInput, setFilterTypeInput] = useState(() => searchParams.get("filterType") || "")
+    const [filterStatusInput, setFilterStatusInput] = useState(() => searchParams.get("filterStatus") || "")
 
     const [sort, setSort] = useState<{ field: string; order: string } | null>(null)
 
@@ -44,6 +46,8 @@ export default function Dashboard() {
         empresa: empresaInput,
         dateFrom: dateFromInput,
         dateTo: dateToInput,
+        filterType: filterTypeInput,
+        filterStatus: filterStatusInput,
     })
 
     useEffect(() => {
@@ -53,10 +57,12 @@ export default function Dashboard() {
                 empresa: empresaInput,
                 dateFrom: dateFromInput,
                 dateTo: dateToInput,
+                filterType: filterTypeInput,
+                filterStatus: filterStatusInput,
             })
         }, 350)
         return () => clearTimeout(timer)
-    }, [searchInput, empresaInput, dateFromInput, dateToInput])
+    }, [searchInput, empresaInput, dateFromInput, dateToInput, filterTypeInput, filterStatusInput])
 
     useEffect(() => {
         const next = new URLSearchParams(searchParams)
@@ -68,6 +74,13 @@ export default function Dashboard() {
         else next.delete("dateFrom")
         if (debouncedFilters.dateTo) next.set("dateTo", debouncedFilters.dateTo)
         else next.delete("dateTo")
+        if (debouncedFilters.filterType && debouncedFilters.filterStatus) {
+            next.set("filterType", debouncedFilters.filterType)
+            next.set("filterStatus", debouncedFilters.filterStatus)
+        } else {
+            next.delete("filterType")
+            next.delete("filterStatus")
+        }
         setSearchParams(next, { replace: true })
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [debouncedFilters])
@@ -85,6 +98,7 @@ export default function Dashboard() {
             const result = await getProjects({
                 search: debouncedFilters.search || undefined,
                 empresa: debouncedFilters.empresa || undefined,
+                status: debouncedFilters.filterType === 'project' ? (debouncedFilters.filterStatus || undefined) : undefined,
                 dateFrom: debouncedFilters.dateFrom || undefined,
                 dateTo: debouncedFilters.dateTo || undefined,
                 offset: pageParam as number,
@@ -111,12 +125,18 @@ export default function Dashboard() {
         })
         : projects
 
+    const filteredProjects = debouncedFilters.filterType === 'project' && debouncedFilters.filterStatus
+        ? sortedProjects.filter(p => p.status === debouncedFilters.filterStatus)
+        : sortedProjects
+
     const isSearching = searchInput !== debouncedFilters.search
         || empresaInput !== debouncedFilters.empresa
         || dateFromInput !== debouncedFilters.dateFrom
         || dateToInput !== debouncedFilters.dateTo
+        || filterTypeInput !== debouncedFilters.filterType
+        || filterStatusInput !== debouncedFilters.filterStatus
 
-    const hasActiveFilters = debouncedFilters.search || debouncedFilters.empresa || debouncedFilters.dateFrom || debouncedFilters.dateTo
+    const hasActiveFilters = debouncedFilters.search || debouncedFilters.empresa || debouncedFilters.dateFrom || debouncedFilters.dateTo || debouncedFilters.filterType
 
     const dateRangeLabel = dateFromInput && dateToInput
         ? `${formatDateShort(dateFromInput)} \u2192 ${formatDateShort(dateToInput)}`
@@ -136,11 +156,18 @@ export default function Dashboard() {
         })
     }
 
+    const handleFilterChange = (type: 'project' | 'task' | null, status: string | null) => {
+        setFilterTypeInput(type || "")
+        setFilterStatusInput(status || "")
+    }
+
     const clearAllFilters = () => {
         setSearchInput("")
         setEmpresaInput("")
         setDateFromInput("")
         setDateToInput("")
+        setFilterTypeInput("")
+        setFilterStatusInput("")
     }
 
     if (isLoading && authLoading) return <Spineer />
@@ -250,15 +277,25 @@ export default function Dashboard() {
                     )}
                 </div>
 
-                {sortedProjects.length ? (
+                {filteredProjects.length ? (
                     <div className="border border-slate-100 mt-6 bg-white">
                         <ProjectTableHeader
                             sortBy={sort?.field}
                             sortOrder={sort?.order}
                             onSort={handleSort}
+                            filterType={(filterTypeInput || null) as 'project' | 'task' | null}
+                            filterStatus={filterStatusInput || null}
+                            onFilterChange={handleFilterChange}
                         />
-                        {sortedProjects.map((project: DashboardProject) => (
-                            <ProjectTableRow key={project._id} project={project} user={user} />
+                        {filteredProjects.map((project: DashboardProject) => (
+                            <ProjectTableRow
+                                key={project._id}
+                                project={project}
+                                user={user}
+                                filterType={(filterTypeInput || null) as 'project' | 'task' | null}
+                                filterStatus={filterStatusInput || null}
+                                forceExpanded={filterTypeInput === "task" && !!filterStatusInput}
+                            />
                         ))}
                         {hasNextPage && (
                             <div className="flex justify-center py-4">

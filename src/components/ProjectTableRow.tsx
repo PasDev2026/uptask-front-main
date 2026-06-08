@@ -1,4 +1,4 @@
-import { Fragment } from "react"
+import { Fragment, useState, useRef } from "react"
 import { Disclosure, Menu, Transition } from "@headlessui/react"
 import { EllipsisVerticalIcon, ChevronDownIcon } from "@heroicons/react/20/solid"
 
@@ -14,19 +14,62 @@ import PriorityPopover from "./PriorityPopover"
 import { useUpdateProjectStatus } from "../hooks/useUpdateProjectStatus"
 import { useUpdateProjectPriority } from "../hooks/useUpdateProjectPriority"
 import { useUpdateProjectResponsible } from "../hooks/useUpdateProjectResponsible"
+import { useUpdateProjectName } from "../hooks/useUpdateProjectName"
 import { TABLE_GRID } from "../constants/tableColumns"
 
 type ProjectTableRowProps = {
     project: DashboardProject
     user: { _id: string }
+    filterType: 'project' | 'task' | null
+    filterStatus: string | null
+    forceExpanded?: boolean
 }
 
-export default function ProjectTableRow({ project, user }: ProjectTableRowProps) {
+export default function ProjectTableRow({ project, user, filterType, filterStatus, forceExpanded }: ProjectTableRowProps) {
     const location = useLocation()
     const navigate = useNavigate()
     const updateProjectStatus = useUpdateProjectStatus()
     const updateProjectPriority = useUpdateProjectPriority()
     const updateProjectResponsible = useUpdateProjectResponsible()
+    const updateProjectName = useUpdateProjectName()
+    const [isEditing, setIsEditing] = useState(false)
+    const [editValue, setEditValue] = useState("")
+    const clickTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+
+    const handleNameClick = () => {
+        if (clickTimer.current) {
+            clearTimeout(clickTimer.current)
+            clickTimer.current = null
+            return
+        }
+        clickTimer.current = setTimeout(() => {
+            clickTimer.current = null
+            navigate(`/projects/${project._id}/details-projects`)
+        }, 250)
+    }
+
+    const handleNameDoubleClick = () => {
+        if (clickTimer.current) {
+            clearTimeout(clickTimer.current)
+            clickTimer.current = null
+        }
+        setEditValue(project.projectName)
+        setIsEditing(true)
+    }
+
+    const handleEditKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter" && editValue.trim()) {
+            updateProjectName.mutate({
+                projectId: project._id,
+                projectName: editValue.trim(),
+                description: project.description ?? "",
+            })
+            setIsEditing(false)
+        }
+        if (e.key === "Escape") {
+            setIsEditing(false)
+        }
+    }
 
     return (
         <Disclosure as="div" className="border-b border-slate-100 last:border-b-0">
@@ -56,12 +99,25 @@ export default function ProjectTableRow({ project, user }: ProjectTableRowProps)
                                     Colaborador
                                 </span>
                             )}
-                            <Link
-                                to={`/projects/${project._id}/details-projects`}
-                                className="font-medium text-brand-dark truncate hover:underline text-sm"
-                            >
-                                {project.projectName}
-                            </Link>
+                            {isEditing ? (
+                                <input
+                                    type="text"
+                                    value={editValue}
+                                    onChange={(e) => setEditValue(e.target.value)}
+                                    onKeyDown={handleEditKeyDown}
+                                    onBlur={() => setIsEditing(false)}
+                                    autoFocus
+                                    className="flex-1 text-sm font-medium text-brand-dark border border-brand-primary rounded px-2 py-0.5 focus:outline-none min-w-0"
+                                />
+                            ) : (
+                                <span
+                                    onClick={handleNameClick}
+                                    onDoubleClick={handleNameDoubleClick}
+                                    className="font-medium text-brand-dark truncate hover:underline text-sm cursor-pointer"
+                                >
+                                    {project.projectName}
+                                </span>
+                            )}
                         </div>
                         </div>
 
@@ -166,7 +222,7 @@ export default function ProjectTableRow({ project, user }: ProjectTableRowProps)
 
                     <Transition
                         as={Fragment}
-                        show={open}
+                        show={open || forceExpanded}
                         enter="transition duration-100 ease-out"
                         enterFrom="transform scale-y-95 opacity-0"
                         enterTo="transform scale-y-100 opacity-100"
@@ -180,6 +236,8 @@ export default function ProjectTableRow({ project, user }: ProjectTableRowProps)
                                 canEdit={true}
                                 projectStartDate={project.startDate}
                                 projectDueDate={project.dueDate}
+                                filterType={filterType}
+                                filterStatus={filterStatus}
                             />
                         </Disclosure.Panel>
                     </Transition>

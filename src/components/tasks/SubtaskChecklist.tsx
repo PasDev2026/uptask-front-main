@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { getSubtasks, createTask, updateStatusTask } from "../../api/task.api";
+import { useUpdateTaskName } from "../../hooks/useUpdateTaskName";
 import { TaskStatus } from "../../types";
 
 type SubtaskChecklistProps = {
@@ -10,6 +11,9 @@ type SubtaskChecklistProps = {
 
 export default function SubtaskChecklist({ projectId, taskId }: SubtaskChecklistProps) {
   const [newSubtask, setNewSubtask] = useState("");
+  const [editingSubtaskId, setEditingSubtaskId] = useState<string | null>(null)
+  const [editValue, setEditValue] = useState("")
+  const updateTaskName = useUpdateTaskName()
   const queryClient = useQueryClient();
 
   const { data: subtasks = [], isLoading } = useQuery({
@@ -70,9 +74,45 @@ export default function SubtaskChecklist({ projectId, taskId }: SubtaskChecklist
                 onChange={() => handleToggle(sub._id, sub.status)}
                 className="h-4 w-4 rounded border-gray-300 text-sky-600 focus:ring-sky-500"
               />
-              <span className={sub.status === "completed" ? "line-through text-slate-400" : "text-slate-700"}>
-                {sub.name}
-              </span>
+              {editingSubtaskId === sub._id ? (
+                <input
+                  type="text"
+                  value={editValue}
+                  onChange={(e) => setEditValue(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === "Enter" && editValue.trim()) {
+                      updateTaskName.mutate({
+                        projectId,
+                        taskId: sub._id,
+                        name: editValue.trim(),
+                        description: sub.description ?? "",
+                      })
+                      setEditingSubtaskId(null)
+                      setEditValue("")
+                    }
+                    if (e.key === "Escape") {
+                      setEditingSubtaskId(null)
+                      setEditValue("")
+                    }
+                  }}
+                  onBlur={() => {
+                    setEditingSubtaskId(null)
+                    setEditValue("")
+                  }}
+                  autoFocus
+                  className="flex-1 text-sm text-slate-700 border border-sky-500 rounded px-2 py-0.5 focus:outline-none min-w-0"
+                />
+              ) : (
+                <span
+                  onDoubleClick={() => {
+                    setEditValue(sub.name)
+                    setEditingSubtaskId(sub._id)
+                  }}
+                  className={sub.status === "completed" ? "line-through text-slate-400" : "text-slate-700"}
+                >
+                  {sub.name}
+                </span>
+              )}
             </li>
           ))}
         </ul>
